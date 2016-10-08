@@ -19,11 +19,12 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 import static android.R.id.list;
 
 public class ExcelActivity extends AppCompatActivity {
-    int click=0;
-    String bt1="0",bt2="0",bt3="0",bt4="0",bt5="0",bt6="0",bt7="0",bt8="0",bt9="0";
+    int click = 0;
+    String[] btList = {"0","0","0","0","0","0","0","0","0"};
     BluetoothSPP bt;
     String receive;
-    Button left,right,center,down,up,leftup,leftdown,rightup,rightdown;
+    Button left, right, center, down, up, leftup, leftdown, rightup, rightdown;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,13 +44,23 @@ public class ExcelActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 List<CustomVo> list = new ArrayList<CustomVo>();
-                click=1;
-                list.add(new CustomVo(click,bt1,bt2,bt3,bt4,bt5,bt6,bt7,bt8,bt9));
-
-
-
+                click = 1;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2],btList[3],btList[4],btList[5],btList[6],btList[7],btList[8]));// 블투값을 넣음, 자세상태, 각셀 값
             }
         });
+
+
+        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            public void onDataReceived(byte[] data, String message) {
+                String[] bldata = message.split(",");
+
+                for (int i = 0; i <bldata.length ; i++) {
+                    btList[i] = bldata[i];
+                }
+            }
+        });
+
+
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -146,16 +157,6 @@ public class ExcelActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-
-
-
-
-
-
     }
 
     public void onDestroy() {
@@ -201,6 +202,7 @@ public class ExcelActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.main_menu, menu);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
