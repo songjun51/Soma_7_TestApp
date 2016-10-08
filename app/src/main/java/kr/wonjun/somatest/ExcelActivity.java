@@ -20,10 +20,11 @@ import static android.R.id.list;
 
 public class ExcelActivity extends AppCompatActivity {
     int click = 0;
-    String[] btList = {"0","0","0","0","0","0","0","0","0"};
+    String[] btList = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
     BluetoothSPP bt;
     String receive;
     Button left, right, center, down, up, leftup, leftdown, rightup, rightdown;
+    List<CustomVo> list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,74 +40,81 @@ public class ExcelActivity extends AppCompatActivity {
         leftdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
         rightup = (Button) findViewById(R.id.activity_execl_btn_leftup);
         rightdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
-
-        left.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                List<CustomVo> list = new ArrayList<CustomVo>();
-                click = 1;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2],btList[3],btList[4],btList[5],btList[6],btList[7],btList[8]));// 블투값을 넣음, 자세상태, 각셀 값
-            }
-        });
-
+        list = new ArrayList<CustomVo>();
 
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
                 String[] bldata = message.split(",");
 
-                for (int i = 0; i <bldata.length ; i++) {
+                for (int i = 0; i < bldata.length; i++) {
                     btList[i] = bldata[i];
                 }
             }
         });
 
-
+        left.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                click = 4;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));// 블투값을 넣음, 자세상태, 각셀 값
+            }
+        });
         right.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "right", Toast.LENGTH_SHORT).show();
+                click = 6;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
+
+
             }
         });
         up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "up", Toast.LENGTH_SHORT).show();
+                click = 2;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
         down.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "down", Toast.LENGTH_SHORT).show();
+                click = 8;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
         center.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "center", Toast.LENGTH_SHORT).show();
+                click = 5;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
         leftup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "leftup", Toast.LENGTH_SHORT).show();
+                click = 1;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
         leftdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "leftdown", Toast.LENGTH_SHORT).show();
+                click = 7;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
         rightup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "rightup", Toast.LENGTH_SHORT).show();
+                click = 3;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
         rightdown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ExcelActivity.this, "rightdown", Toast.LENGTH_SHORT).show();
+                click = 9;
+                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
             }
         });
 

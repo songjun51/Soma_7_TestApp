@@ -8,7 +8,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
@@ -17,12 +22,37 @@ public class MainActivity extends AppCompatActivity {
 
     BluetoothSPP bt;
     String receive;
-
+    ArrayList<String> list;
+    ArrayAdapter<String> adapter;
+    ListView lv;
+    InputMethodManager imm;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
+
+        list = new ArrayList<String>();
+        list.add("01");
+        list.add("02");
+        list.add("03");
+        list.add("04");
+        list.add("05");
+        list.add("06");
+        list.add("07");
+        list.add("08");
+        list.add("09");
+        list.add("10");
+
+        adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_single_choice, list);
+
+        lv = (ListView) findViewById(R.id.lv);
+        imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        lv.setAdapter(adapter);
+
+//        findViewById(R.id.btn1).setOnClickListener(clickListener);
+//        findViewById(R.id.btn2).setOnClickListener(clickListener);
         bt = new BluetoothSPP(this);
 
         if (!bt.isBluetoothAvailable())
