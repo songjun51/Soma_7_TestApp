@@ -55,6 +55,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     Cell cell = null;
     Sheet sheet1 = null;
     Row row = null;
+    File file;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +71,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         leftdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
         rightup = (Button) findViewById(R.id.activity_execl_btn_leftup);
         rightdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
-        ReadBtn = (Button) findViewById(R.id.activity_execl_seeExecl);
-        saveExcel = (Button) findViewById(R.id.activity_excel_saveExcel);
+//        saveExcel = (Button) findViewById(R.id.activity_execl_saveExecl);
 
         leftup.setOnClickListener(this);
         left.setOnClickListener(this);
@@ -82,7 +82,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         rightup.setOnClickListener(this);
         up.setOnClickListener(this);
         down.setOnClickListener(this);
-        saveExcel.setOnClickListener(this);
+//        saveExcel.setOnClickListener(this);
 
 
 //        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
@@ -96,79 +96,12 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
 //        });
 
 
-        bt = new BluetoothSPP(this);
+        bluetoothFirtSetting();
+        firstExcelSetting();
 
-        if (!bt.isBluetoothAvailable())
-
-        {
-            Toast.makeText(getApplicationContext()
-                    , "블루투스를 켜주세요"
-                    , Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
-
-        {
-            public void onDeviceConnected(String name, String address) {
-                Toast.makeText(getApplicationContext()
-                        , "연결되었습니다", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onDeviceDisconnected() {
-                Toast.makeText(getApplicationContext()
-                        , "연결이끊겼습니다"
-                        , Toast.LENGTH_SHORT).show();
-            }
-
-            public void onDeviceConnectionFailed() {
-            }
-        });
-
-        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
-            public void onNewConnection(String name, String address) {
-            }
-
-            public void onAutoConnectionStarted() {
-            }
-        });
-
-        wb = new HSSFWorkbook();
-        // New Sheet
-        sheet1 = wb.createSheet("Shit1");
-
-        row = sheet1.createRow(0);
-
-        cell = row.createCell(0);
-        cell.setCellValue("status");
-
-        cell = row.createCell(1);
-        cell.setCellValue("LeftUp");
-
-        cell = row.createCell(2);
-        cell.setCellValue("Up");
-
-        cell = row.createCell(3);
-        cell.setCellValue("RightUp");
-
-        cell = row.createCell(4);
-        cell.setCellValue("Left");
-
-        cell = row.createCell(5);
-        cell.setCellValue("Center");
-
-        cell = row.createCell(6);
-        cell.setCellValue("Right");
-
-        cell = row.createCell(7);
-        cell.setCellValue("LeftDown");
-
-        cell = row.createCell(8);
-        cell.setCellValue("Down");
-
-        cell = row.createCell(9);
-        cell.setCellValue("RightDown");
     }
+
+
 
     public void onDestroy() {
         super.onDestroy();
@@ -231,13 +164,12 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         return super.onOptionsItemSelected(item);
     }
 
+    private void firstExcelSetting(){
+        file = new File(this.getExternalFilesDir(null), "myExcel.xls");
+        wb = new HSSFWorkbook();
+        // New Sheet
+        sheet1 = wb.createSheet("Shit1");
 
-    private boolean saveExcelFile(Context context, String fileName) {
-
-        // New Workbook
-
-
-        // Generate column headings
         row = sheet1.createRow(0);
 
         cell = row.createCell(0);
@@ -269,51 +201,90 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
 
         cell = row.createCell(9);
         cell.setCellValue("RightDown");
-
-
-//        CustomVo vo;
-
-
-        row = sheet1.createRow(rowIdx);
-
-
-        cell = row.createCell(0);
-        cell.setCellValue(click);
-
-        cell = row.createCell(1);
-        cell.setCellValue("1");
-
-        cell = row.createCell(2);
-        cell.setCellValue("2");
-
-        cell = row.createCell(3);
-        cell.setCellValue("2");
-
-        cell = row.createCell(4);
-        cell.setCellValue("2");
-
-        cell = row.createCell(5);
-        cell.setCellValue("2");
-
-        cell = row.createCell(6);
-        cell.setCellValue("2");
-
-        cell = row.createCell(7);
-        cell.setCellValue("2");
-
-        cell = row.createCell(8);
-        cell.setCellValue("2");
-
-        cell = row.createCell(9);
-        cell.setCellValue("2");
-        rowIdx++;
-
-
-        // Create a path where we will place our List of objects on external
-        // storage
-        return true;
-
     }
+
+//    private boolean saveExcelFile(Context context, String fileName) {
+//
+//        // New Workbook
+//
+//
+//        // Generate column headings
+//        row = sheet1.createRow(0);
+//
+//        cell = row.createCell(0);
+//        cell.setCellValue("status");
+//
+//        cell = row.createCell(1);
+//        cell.setCellValue("LeftUp");
+//
+//        cell = row.createCell(2);
+//        cell.setCellValue("Up");
+//
+//        cell = row.createCell(3);
+//        cell.setCellValue("RightUp");
+//
+//        cell = row.createCell(4);
+//        cell.setCellValue("Left");
+//
+//        cell = row.createCell(5);
+//        cell.setCellValue("Center");
+//
+//        cell = row.createCell(6);
+//        cell.setCellValue("Right");
+//
+//        cell = row.createCell(7);
+//        cell.setCellValue("LeftDown");
+//
+//        cell = row.createCell(8);
+//        cell.setCellValue("Down");
+//
+//        cell = row.createCell(9);
+//        cell.setCellValue("RightDown");
+//
+//
+////        CustomVo vo;
+//
+//
+//        row = sheet1.createRow(rowIdx);
+//
+//
+//        cell = row.createCell(0);
+//        cell.setCellValue(click);
+//
+//        cell = row.createCell(1);
+//        cell.setCellValue("1");
+//
+//        cell = row.createCell(2);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(3);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(4);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(5);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(6);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(7);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(8);
+//        cell.setCellValue("2");
+//
+//        cell = row.createCell(9);
+//        cell.setCellValue("2");
+//        rowIdx++;
+//
+//
+//        // Create a path where we will place our List of objects on external
+//        // storage
+//        return true;
+//
+//    }
 
     public void onClick(View v) {
         switch (v.getId()) {
@@ -352,68 +323,103 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.activity_execl_btn_down:
                 click = 8;
-                writebt();
-                break;
-            case R.id.activity_excel_saveExcel:
-                File file = new File(this.getExternalFilesDir(null), "myExcel.xls");
-                FileOutputStream os = null;
-                try {
-                    os = new FileOutputStream(file);
-                    wb.write(os);
-                    Log.w("FileUtils", "Writing file" + file);
-                } catch (IOException e) {
-                    Log.w("FileUtils", "Error writing " + file, e);
-                } catch (Exception e) {
-                    Log.w("FileUtils", "Failed to save file", e);
-                } finally {
-                    try {
-                        if (null != os)
-                            os.close();
-                    } catch (Exception ex) {
-                    }
-                }
-                Toast.makeText(this, "값저장완료", Toast.LENGTH_SHORT).show();
-                Log.e("fuck","저장완료");
                 break;
         }
     }
 
 
-    public void writebt() {
+    private void writebt() {
         row = sheet1.createRow(rowIdx);
-
-
         cell = row.createCell(0);
         cell.setCellValue(click);
 
         cell = row.createCell(1);
-        cell.setCellValue("1");
+        cell.setCellValue(btList[0]);
 
         cell = row.createCell(2);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[1]);
 
         cell = row.createCell(3);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[2]);
 
         cell = row.createCell(4);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[3]);
 
         cell = row.createCell(5);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[4]);
 
         cell = row.createCell(6);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[5]);
 
         cell = row.createCell(7);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[6]);
 
         cell = row.createCell(8);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[7]);
 
         cell = row.createCell(9);
-        cell.setCellValue("2");
+        cell.setCellValue(btList[8]);
         rowIdx++;
         Log.e("fuck","값입력");
+        saveExcleFile();
+    }
+    private void saveExcleFile(){
+        FileOutputStream os = null;
+        try {
+            os = new FileOutputStream(file);
+            wb.write(os);
+            Log.w("FileUtils", "Writing file" + file);
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
+        } finally {
+            try {
+                if (null != os)
+                    os.close();
+            } catch (Exception ex) {
+            }
+        }
+        Toast.makeText(this, "값저장완료", Toast.LENGTH_SHORT).show();
+        Log.e("fuck","저장완료");
+    }
+    private void bluetoothFirtSetting() {
+        bt = new BluetoothSPP(this);
+
+        if (!bt.isBluetoothAvailable())
+
+        {
+            Toast.makeText(getApplicationContext()
+                    , "블루투스를 켜주세요"
+                    , Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
+
+        {
+            public void onDeviceConnected(String name, String address) {
+                Toast.makeText(getApplicationContext()
+                        , "연결되었습니다", Toast.LENGTH_SHORT).show();
+            }
+
+            public void onDeviceDisconnected() {
+                Toast.makeText(getApplicationContext()
+                        , "연결이끊겼습니다"
+                        , Toast.LENGTH_SHORT).show();
+            }
+
+            public void onDeviceConnectionFailed() {
+            }
+        });
+
+        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
+            public void onNewConnection(String name, String address) {
+            }
+
+            public void onAutoConnectionStarted() {
+            }
+        });
     }
 }
 
