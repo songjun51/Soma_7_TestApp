@@ -1,5 +1,7 @@
 package kr.wonjun.somatest;
 
+import android.util.Log;
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFShape;
@@ -102,21 +104,22 @@ public class ExcelWriter {
 
         }
 
-        File file = new File("C:\\excel\\wonjunWite.xls");
+        File file = new File("wonjunWite.xls");
         FileOutputStream fos = null;
 
         try {
             fos = new FileOutputStream(file);
             workbook.write(fos);
-        }catch (FileNotFoundException e){
-            e.printStackTrace();
-        }catch (IOException e){
-            e.printStackTrace();
+            Log.w("FileUtils", "Writing file" + file);
+        } catch (IOException e) {
+            Log.w("FileUtils", "Error writing " + file, e);
+        } catch (Exception e) {
+            Log.w("FileUtils", "Failed to save file", e);
         } finally {
-            try{
-                if(workbook!=null) workbook.close();
-            } catch (IOException e){
-                e.printStackTrace();
+            try {
+                if (null != fos)
+                    fos.close();
+            } catch (Exception ex) {
             }
         }
     }

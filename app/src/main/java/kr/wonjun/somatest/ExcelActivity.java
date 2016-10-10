@@ -1,30 +1,60 @@
 package kr.wonjun.somatest;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Iterator;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.hssf.util.HSSFColor;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import android.app.Activity;
+import android.content.Context;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 
-import static android.R.id.list;
-
-public class ExcelActivity extends AppCompatActivity {
+public class ExcelActivity extends AppCompatActivity implements View.OnClickListener {
     int click = 0;
     String[] btList = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
     BluetoothSPP bt;
     String receive;
-    Button left, right, center, down, up, leftup, leftdown, rightup, rightdown;
-    List<CustomVo> list;
+    Button left, right, center, down, up, leftup, leftdown, rightup, rightdown, saveExcel, ReadBtn;
+
+    Workbook wb;
+    int rowIdx = 1;
+    Cell cell = null;
+    Sheet sheet1 = null;
+    Row row = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,83 +70,30 @@ public class ExcelActivity extends AppCompatActivity {
         leftdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
         rightup = (Button) findViewById(R.id.activity_execl_btn_leftup);
         rightdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
-        list = new ArrayList<CustomVo>();
+        ReadBtn = (Button) findViewById(R.id.activity_execl_seeExecl);
+        saveExcel = (Button) findViewById(R.id.activity_excel_saveExcel);
 
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String message) {
-                String[] bldata = message.split(",");
-
-                for (int i = 0; i < bldata.length; i++) {
-                    btList[i] = bldata[i];
-                }
-            }
-        });
-
-        left.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 4;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));// 블투값을 넣음, 자세상태, 각셀 값
-            }
-        });
-        right.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 6;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
+        leftup.setOnClickListener(this);
+        left.setOnClickListener(this);
+        leftdown.setOnClickListener(this);
+        center.setOnClickListener(this);
+        right.setOnClickListener(this);
+        rightdown.setOnClickListener(this);
+        rightup.setOnClickListener(this);
+        up.setOnClickListener(this);
+        down.setOnClickListener(this);
+        saveExcel.setOnClickListener(this);
 
 
-            }
-        });
-        up.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 2;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
-        down.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 8;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
-        center.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 5;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
-        leftup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 1;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
-        leftdown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 7;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
-        rightup.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 3;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
-        rightdown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                click = 9;
-                list.add(new CustomVo(click, btList[0], btList[1], btList[2], btList[3], btList[4], btList[5], btList[6], btList[7], btList[8]));
-            }
-        });
+//        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+//            public void onDataReceived(byte[] data, String message) {
+//                String[] bldata = message.split(",");
+//
+//                for (int i = 0; i < bldata.length; i++) {
+//                    btList[i] = bldata[i];
+//                }
+//            }
+//        });
 
 
         bt = new BluetoothSPP(this);
@@ -155,16 +132,42 @@ public class ExcelActivity extends AppCompatActivity {
             public void onAutoConnectionStarted() {
             }
         });
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String message) {
-                receive = message;
-                if (receive.equals("to=true")) {
-                } else if (receive.equals("to=false")) {
 
-                }
-            }
-        });
+        wb = new HSSFWorkbook();
+        // New Sheet
+        sheet1 = wb.createSheet("Shit1");
 
+        row = sheet1.createRow(0);
+
+        cell = row.createCell(0);
+        cell.setCellValue("status");
+
+        cell = row.createCell(1);
+        cell.setCellValue("LeftUp");
+
+        cell = row.createCell(2);
+        cell.setCellValue("Up");
+
+        cell = row.createCell(3);
+        cell.setCellValue("RightUp");
+
+        cell = row.createCell(4);
+        cell.setCellValue("Left");
+
+        cell = row.createCell(5);
+        cell.setCellValue("Center");
+
+        cell = row.createCell(6);
+        cell.setCellValue("Right");
+
+        cell = row.createCell(7);
+        cell.setCellValue("LeftDown");
+
+        cell = row.createCell(8);
+        cell.setCellValue("Down");
+
+        cell = row.createCell(9);
+        cell.setCellValue("RightDown");
     }
 
     public void onDestroy() {
@@ -228,5 +231,190 @@ public class ExcelActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+    private boolean saveExcelFile(Context context, String fileName) {
+
+        // New Workbook
+
+
+        // Generate column headings
+        row = sheet1.createRow(0);
+
+        cell = row.createCell(0);
+        cell.setCellValue("status");
+
+        cell = row.createCell(1);
+        cell.setCellValue("LeftUp");
+
+        cell = row.createCell(2);
+        cell.setCellValue("Up");
+
+        cell = row.createCell(3);
+        cell.setCellValue("RightUp");
+
+        cell = row.createCell(4);
+        cell.setCellValue("Left");
+
+        cell = row.createCell(5);
+        cell.setCellValue("Center");
+
+        cell = row.createCell(6);
+        cell.setCellValue("Right");
+
+        cell = row.createCell(7);
+        cell.setCellValue("LeftDown");
+
+        cell = row.createCell(8);
+        cell.setCellValue("Down");
+
+        cell = row.createCell(9);
+        cell.setCellValue("RightDown");
+
+
+//        CustomVo vo;
+
+
+        row = sheet1.createRow(rowIdx);
+
+
+        cell = row.createCell(0);
+        cell.setCellValue(click);
+
+        cell = row.createCell(1);
+        cell.setCellValue("1");
+
+        cell = row.createCell(2);
+        cell.setCellValue("2");
+
+        cell = row.createCell(3);
+        cell.setCellValue("2");
+
+        cell = row.createCell(4);
+        cell.setCellValue("2");
+
+        cell = row.createCell(5);
+        cell.setCellValue("2");
+
+        cell = row.createCell(6);
+        cell.setCellValue("2");
+
+        cell = row.createCell(7);
+        cell.setCellValue("2");
+
+        cell = row.createCell(8);
+        cell.setCellValue("2");
+
+        cell = row.createCell(9);
+        cell.setCellValue("2");
+        rowIdx++;
+
+
+        // Create a path where we will place our List of objects on external
+        // storage
+        return true;
+
+    }
+
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.activity_execl_btn_left:
+                click = 4;
+                Log.e("shit","왼쪽버튼");
+                writebt();
+                break;
+            case R.id.activity_execl_btn_leftdown:
+                click = 7;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_leftup:
+                click = 1;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_right:
+                click = 6;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_rightdown:
+                click = 9;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_rightup:
+                click = 3;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_center:
+                click = 5;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_up:
+                click = 2;
+                writebt();
+                break;
+            case R.id.activity_execl_btn_down:
+                click = 8;
+                writebt();
+                break;
+            case R.id.activity_excel_saveExcel:
+                File file = new File(this.getExternalFilesDir(null), "myExcel.xls");
+                FileOutputStream os = null;
+                try {
+                    os = new FileOutputStream(file);
+                    wb.write(os);
+                    Log.w("FileUtils", "Writing file" + file);
+                } catch (IOException e) {
+                    Log.w("FileUtils", "Error writing " + file, e);
+                } catch (Exception e) {
+                    Log.w("FileUtils", "Failed to save file", e);
+                } finally {
+                    try {
+                        if (null != os)
+                            os.close();
+                    } catch (Exception ex) {
+                    }
+                }
+                Toast.makeText(this, "값저장완료", Toast.LENGTH_SHORT).show();
+                Log.e("fuck","저장완료");
+                break;
+        }
+    }
+
+
+    public void writebt() {
+        row = sheet1.createRow(rowIdx);
+
+
+        cell = row.createCell(0);
+        cell.setCellValue(click);
+
+        cell = row.createCell(1);
+        cell.setCellValue("1");
+
+        cell = row.createCell(2);
+        cell.setCellValue("2");
+
+        cell = row.createCell(3);
+        cell.setCellValue("2");
+
+        cell = row.createCell(4);
+        cell.setCellValue("2");
+
+        cell = row.createCell(5);
+        cell.setCellValue("2");
+
+        cell = row.createCell(6);
+        cell.setCellValue("2");
+
+        cell = row.createCell(7);
+        cell.setCellValue("2");
+
+        cell = row.createCell(8);
+        cell.setCellValue("2");
+
+        cell = row.createCell(9);
+        cell.setCellValue("2");
+        rowIdx++;
+        Log.e("fuck","값입력");
+    }
 }
+
 
