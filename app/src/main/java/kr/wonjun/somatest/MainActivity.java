@@ -3,6 +3,8 @@ package kr.wonjun.somatest;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -13,49 +15,107 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 import static android.R.id.input;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnItemClickListener {
 
     BluetoothSPP bt;
-    ArrayList<String> list;
-    ArrayAdapter<String> adapter;
-    ListView lv;
+    Button cnnet;
+    ListView list;
     AlertDialog.Builder alert;
-
+    ArrayAdapter<String> Adapter;
+    ArrayList<String> arDessert;
+    int[] sendDataList = new int[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
         alert = new AlertDialog.Builder(getApplicationContext());
+        arDessert = new ArrayList<String>();
 
+        for (int i = 1; i <= 32; i++) {
+            arDessert.add(String.valueOf(i));
 
-
-        lv = (ListView) findViewById(R.id.lv);
-        lv.setAdapter(adapter);
-        list = new ArrayList<String>();
-        for (int i = 0; i < 30; i++) {
-            list.add(Integer.toString(i) + "꾹 눌러 메모해주세요 하악");
         }
+
+        cnnet=(Button) findViewById(R.id.activity_execl_saveExecl);
+        Adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, arDessert);
+
+        // 어댑터 연결
+        list = (ListView) findViewById(R.id.lv);
+        list.setAdapter(Adapter);
+
+        // 리스트뷰 속성(없어도 구현 가능)
+        // 항목을 선택하는 모드
+        list.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        // 항목 사이의 구분선 지정
+        list.setDivider(new ColorDrawable(Color.BLACK));
+        // 구분선의 높이 지정
+        list.setDividerHeight(1);
+
 //
+
+        //만약에 온 값이 있다면 토스트로 출력
+
+
+        list.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(MainActivity.this, ""+position, Toast.LENGTH_SHORT).show();
+                bt.send(String.valueOf(sendDataList[position]),true);
+
+
+            }
+        });
+
+
+//        list.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                alert.setTitle("정민이형 똥멍청이");
+//                alert.setMessage("수정할 내용을 입력");
+//                final EditText input = new EditText(getApplicationContext());
+//                alert.setView(input);
+//                alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        arDessert.set(position, position + " : " + input.getText().toString());
+//                    }
+//
+//                });
+//
+//                return false;
+//            }
+//        });
+
+////        lv.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) Longlistener);
         bt = new BluetoothSPP(this);
-        if (!bt.isBluetoothAvailable()) {
+
+        if (!bt.isBluetoothAvailable())
+
+        {
             Toast.makeText(getApplicationContext()
                     , "블루투스를 켜주세요"
                     , Toast.LENGTH_SHORT).show();
             finish();
         }
-        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener() {
+
+        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
+
+        {
             public void onDeviceConnected(String name, String address) {
                 Toast.makeText(getApplicationContext()
                         , "연결되었습니다", Toast.LENGTH_SHORT).show();
@@ -68,10 +128,9 @@ public class MainActivity extends AppCompatActivity {
             }
 
             public void onDeviceConnectionFailed() {
-                Toast.makeText(MainActivity.this, "연결실패", Toast.LENGTH_SHORT).show();
             }
         });
-
+//        setup();
         bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
             public void onNewConnection(String name, String address) {
             }
@@ -79,23 +138,19 @@ public class MainActivity extends AppCompatActivity {
             public void onAutoConnectionStarted() {
             }
         });
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String message) {
 
-                Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG).show();
+//        setup();
 
-            }
-        });
-        //만약에 온 값이 있다면 토스트로 출력
-
-
-        lv.setOnItemClickListener(listener);
-//        lv.setOnItemLongClickListener((AdapterView.OnItemLongClickListener) Longlistener);
+        bluetoothFirstSetting();
 
 
     }
 
-    AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+    public void onItemClick(AdapterView<?> parent,View v, int position, long id) {
+
+    }
+
+    OnItemClickListener listener = new OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             bt.send(String.valueOf(position), true);
@@ -124,71 +179,29 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    AdapterView.OnItemClickListener Longlistener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-            alert.setTitle("정민이형 똥멍청이");
-            alert.setMessage("수정할 내용을 입력");
-            final EditText input = new EditText(getApplicationContext());
-            alert.setView(input);
-            alert.setPositiveButton("ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    list.set(position, position + " : " + input.getText().toString());
-                }
+//    AdapterView.OnItemClickListener Longlistener = new AdapterView.OnItemClickListener() {
+//        @Override
+//        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-            });
+//            // 길게 클릭시 포지션 받아서 포지션 : 원하는 텍스트로 변경
+//            alert.setNegativeButton("Cancel",
+//                    new DialogInterface.OnClickListener() {
+//                        public void onClick(DialogInterface dialog, int whichButton) {
+//                            // Canceled.
+//                        }
+//                    });
+//            alert.show();//다이얼로그 끝
+//
+////// 클릭값 수정
+//        }
 
-            // 길게 클릭시 포지션 받아서 포지션 : 원하는 텍스트로 변경
-            alert.setNegativeButton("Cancel",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int whichButton) {
-                            // Canceled.
-                        }
-                    });
-            alert.show();//다이얼로그 끝
-
-// 클릭값 수정
-        }
-    };
-
-    public void onDestroy() {
-        super.onDestroy();
-        bt.stopService();
-    }
-
-    public void onStart() {
-        super.onStart();
-        if (!bt.isBluetoothEnabled()) {
-            bt.enable();
-        } else {
-            if (!bt.isServiceAvailable()) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
-            }
-        }
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
-            if (resultCode == Activity.RESULT_OK)
-                bt.connect(data);
-        } else if (requestCode == BluetoothState.REQUEST_ENABLE_BT) {
-            if (resultCode == Activity.RESULT_OK) {
-                bt.setupService();
-            } else {
-                Toast.makeText(getApplicationContext()
-                        , "블루투스 켜주세요"
-                        , Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
+    
 
     public void setup() {
-        bt.autoConnect("wonjungod");
+        bt.autoConnect("wnjungod");
     }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -212,6 +225,33 @@ public class MainActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+    private void bluetoothFirstSetting() {
 
 
+    }
+
+    public void onPause() {
+        super.onPause();
+        bt.stopService();
+    }
+
+    public void onStart() {
+        super.onStart();
+        if (!bt.isBluetoothEnabled()) {
+            bt.enable();
+        } else {
+            if (!bt.isServiceAvailable()) {
+                bt.setupService();
+                bt.startService(BluetoothState.DEVICE_OTHER);
+                setup();
+            }
+        }
+    }
+
+
+
+    public void onClick(View v) {
+        bt.autoConnect("wnjungod");
+        Toast.makeText(this, "오토커넥", Toast.LENGTH_SHORT).show();
+    }
 }

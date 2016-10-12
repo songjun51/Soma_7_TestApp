@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -56,12 +57,14 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     Sheet sheet1 = null;
     Row row = null;
     File file;
+    TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_execl);
-
+        bluetoothFirtSetting();
+        firstExcelSetting();
         left = (Button) findViewById(R.id.activity_execl_btn_left);
         right = (Button) findViewById(R.id.activity_execl_btn_right);
         up = (Button) findViewById(R.id.activity_execl_btn_up);
@@ -72,6 +75,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         rightup = (Button) findViewById(R.id.activity_execl_btn_leftup);
         rightdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
 //        saveExcel = (Button) findViewById(R.id.activity_execl_saveExecl);
+        tv=(TextView) findViewById(R.id.activity_execl_seeData);
 
         leftup.setOnClickListener(this);
         left.setOnClickListener(this);
@@ -85,19 +89,24 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
 //        saveExcel.setOnClickListener(this);
 
 
-//        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-//            public void onDataReceived(byte[] data, String message) {
-//                String[] bldata = message.split(",");
-//
-//                for (int i = 0; i < bldata.length; i++) {
-//                    btList[i] = bldata[i];
-//                }
-//            }
-//        });
+        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            public void onDataReceived(byte[] data, String message) {
+                receive=message;
+                String[] bldata = message.split(",");
+
+                for (int i = 0; i < bldata.length; i++) {
+                    btList[i] = bldata[i];
+                }
+
+                tv.setText(""+receive);
+            }
+        });
 
 
-        bluetoothFirtSetting();
-        firstExcelSetting();
+
+
+
+
 
     }
 
@@ -138,7 +147,8 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void setup() {
-        bt.autoConnect("wonjungod");
+        bt.autoConnect("wnjungod");
+
     }
 
     @Override
@@ -289,7 +299,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_execl_btn_left:
-                click = 4;
+                  click = 4;
                 Log.e("shit","왼쪽버튼");
                 writebt();
                 break;
