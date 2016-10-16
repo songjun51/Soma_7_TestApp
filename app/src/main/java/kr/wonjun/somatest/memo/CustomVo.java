@@ -1,4 +1,4 @@
-package kr.wonjun.somatest;
+package kr.wonjun.somatest.memo;
 
 /**
  * Created by swj85 on 2016-10-09.
