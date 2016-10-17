@@ -1,9 +1,9 @@
 package kr.wonjun.somatest;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -14,39 +14,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 public class ExcelActivity extends AppCompatActivity implements View.OnClickListener {
     int click = 0;
-    String[] btList = {"0", "0", "0", "0", "0", "0", "0", "0", "0"};
+    String[] btList = {"start", "0", "0", "0", "0", "0", "0", "0", "0", "0", "finish"};
     BluetoothSPP bt;
     String receive;
     Button left, right, center, down, up, leftup, leftdown, rightup, rightdown, saveExcel, ReadBtn;
@@ -72,10 +54,10 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         center = (Button) findViewById(R.id.activity_execl_btn_center);
         leftup = (Button) findViewById(R.id.activity_execl_btn_leftup);
         leftdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
-        rightup = (Button) findViewById(R.id.activity_execl_btn_leftup);
-        rightdown = (Button) findViewById(R.id.activity_execl_btn_leftdown);
+        rightup = (Button) findViewById(R.id.activity_execl_btn_rightup);
+        rightdown = (Button) findViewById(R.id.activity_execl_btn_rightdown);
 //        saveExcel = (Button) findViewById(R.id.activity_execl_saveExecl);
-        tv=(TextView) findViewById(R.id.activity_execl_seeData);
+        tv = (TextView) findViewById(R.id.activity_execl_seeData);
 
         leftup.setOnClickListener(this);
         left.setOnClickListener(this);
@@ -91,25 +73,42 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
 
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
-                receive=message;
+                receive = message;
                 String[] bldata = message.split(",");
 
                 for (int i = 0; i < bldata.length; i++) {
                     btList[i] = bldata[i];
                 }
+                Log.e("asdf", message);
+                tv.setText("" + receive);
 
-                tv.setText(""+receive);
+//                if(btList[0]=="@"||btList[10]=="!") {
+                leftup.setText(btList[1]);
+                up.setText(btList[2]);
+                rightup.setText(btList[3]);
+                left.setText(btList[4]);
+                center.setText(btList[5]);
+                right.setText(btList[6]);
+                leftdown.setText(btList[7]);
+                down.setText(btList[8]);
+                rightdown.setText(btList[9]);
+//                }
+//                else {
+//                    Toast.makeText(ExcelActivity.this, "에러!", Toast.LENGTH_SHORT).show();
+//                }
+//                    AlertDialog.Builder dialog = new AlertDialog.Builder(getApplicationContext());
+//                    dialog.setTitle("에러!");
+//                    dialog.setMessage("에러가 계속된다면 다음 화면을 캡쳐해 A/S센터에 문의해주세요 Tel : 010-3256-8530);\n에러사항 : "+message);
+//                    dialog.show();
+//
+//
+//                }
+
+
             }
         });
 
-
-
-
-
-
-
     }
-
 
 
     public void onDestroy() {
@@ -164,7 +163,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             return true;
         } else if (id == R.id.menu_item_read) {
-            startActivity(new Intent(getApplicationContext(), ReadActivity.class));
+            startActivity(new Intent(getApplicationContext(), TerminalActivity.class));
             return true;
         } else if (id == R.id.menu_item_excel) {
             startActivity(new Intent(getApplicationContext(), ExcelActivity.class));
@@ -174,7 +173,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         return super.onOptionsItemSelected(item);
     }
 
-    private void firstExcelSetting(){
+    private void firstExcelSetting() {
         file = new File(this.getExternalFilesDir(null), "myExcel.xls");
         wb = new HSSFWorkbook();
         // New Sheet
@@ -299,8 +298,8 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_execl_btn_left:
-                  click = 4;
-                Log.e("shit","왼쪽버튼");
+                click = 4;
+                Log.e("shit", "왼쪽버튼");
                 writebt();
                 break;
             case R.id.activity_execl_btn_leftdown:
@@ -370,10 +369,11 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         cell = row.createCell(9);
         cell.setCellValue(btList[8]);
         rowIdx++;
-        Log.e("fuck","값입력");
+        Log.e("fuck", "값입력");
         saveExcleFile();
     }
-    private void saveExcleFile(){
+
+    private void saveExcleFile() {
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(file);
@@ -391,8 +391,9 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
             }
         }
         Toast.makeText(this, "값저장완료", Toast.LENGTH_SHORT).show();
-        Log.e("fuck","저장완료");
+        Log.e("fuck", "저장완료");
     }
+
     private void bluetoothFirtSetting() {
         bt = new BluetoothSPP(this);
 

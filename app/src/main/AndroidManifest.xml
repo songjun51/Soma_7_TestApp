@@ -20,9 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".ReadActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".TerminalActivity" />
+        <activity android:name=".MainActivity" />
+        <activity android:name=".ReadActivity"></activity>
     </application>
 
 </manifest>

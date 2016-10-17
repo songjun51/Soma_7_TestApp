@@ -38,7 +38,7 @@
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:gravity="center_horizontal"
-                android:textSize="50sp"
+                android:textSize="10sp"
                 android:text="엑셀보기" />
 
 
@@ -61,7 +61,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="↖"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/activity_execl_btn_up"
@@ -69,7 +69,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="↑"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/activity_execl_btn_rightup"
@@ -77,7 +77,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="↗"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -95,7 +95,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="←"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/activity_execl_btn_center"
@@ -103,7 +103,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="O"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/activity_execl_btn_right"
@@ -111,7 +111,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="→"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
 
@@ -130,7 +130,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="↙"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/activity_execl_btn_down"
@@ -138,7 +138,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="↓"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/activity_execl_btn_rightdown"
@@ -146,7 +146,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="↘"
-            android:textSize="50sp" />
+            android:textSize="20sp" />
     </LinearLayout>
 
 

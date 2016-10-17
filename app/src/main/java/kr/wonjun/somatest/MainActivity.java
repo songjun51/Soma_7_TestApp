@@ -1,19 +1,15 @@
 package kr.wonjun.somatest;
 
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -23,12 +19,9 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
-
-import static android.R.id.input;
 
 public class MainActivity extends AppCompatActivity implements OnItemClickListener {
 
@@ -216,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
             return true;
         } else if (id == R.id.menu_item_read) {
-            startActivity(new Intent(getApplicationContext(), ReadActivity.class));
+            startActivity(new Intent(getApplicationContext(), TerminalActivity.class));
             return true;
         } else if (id == R.id.menu_item_excel) {
             startActivity(new Intent(getApplicationContext(), ExcelActivity.class));
