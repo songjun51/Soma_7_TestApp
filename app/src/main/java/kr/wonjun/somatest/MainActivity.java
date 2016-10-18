@@ -214,10 +214,16 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
         } else if (id == R.id.menu_item_excel) {
             startActivity(new Intent(getApplicationContext(), ExcelActivity.class));
             return true;
+
+        } else if (id == R.id.menu_item_dot) {
+            startActivity(new Intent(getApplicationContext(), dotActivity.class));
+            return true;
         }
+
 
         return super.onOptionsItemSelected(item);
     }
+
     private void bluetoothFirstSetting() {
 
 
