@@ -168,6 +168,9 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         } else if (id == R.id.menu_item_excel) {
             startActivity(new Intent(getApplicationContext(), ExcelActivity.class));
             return true;
+        }else if (id == R.id.menu_item_dot) {
+            startActivity(new Intent(getApplicationContext(), dotActivity.class));
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -343,31 +346,31 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         cell.setCellValue(click);
 
         cell = row.createCell(1);
-        cell.setCellValue(btList[0]);
-
-        cell = row.createCell(2);
         cell.setCellValue(btList[1]);
 
-        cell = row.createCell(3);
+        cell = row.createCell(2);
         cell.setCellValue(btList[2]);
 
-        cell = row.createCell(4);
+        cell = row.createCell(3);
         cell.setCellValue(btList[3]);
 
-        cell = row.createCell(5);
+        cell = row.createCell(4);
         cell.setCellValue(btList[4]);
 
-        cell = row.createCell(6);
+        cell = row.createCell(5);
         cell.setCellValue(btList[5]);
 
-        cell = row.createCell(7);
+        cell = row.createCell(6);
         cell.setCellValue(btList[6]);
 
-        cell = row.createCell(8);
+        cell = row.createCell(7);
         cell.setCellValue(btList[7]);
 
-        cell = row.createCell(9);
+        cell = row.createCell(8);
         cell.setCellValue(btList[8]);
+
+        cell = row.createCell(9);
+        cell.setCellValue(btList[9]);
         rowIdx++;
         Log.e("fuck", "값입력");
         saveExcleFile();

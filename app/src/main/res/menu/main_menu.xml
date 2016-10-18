@@ -17,5 +17,9 @@
         android:id="@+id/menu_item_excel"
         android:title="excel"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menu_item_dot"
+        android:title="dot"
+        app:showAsAction="never" />
 
 </menu>

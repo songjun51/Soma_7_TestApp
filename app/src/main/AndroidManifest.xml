@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".TerminalActivity" />
         <activity android:name=".MainActivity" />
-        <activity android:name=".ReadActivity"></activity>
+        <!--<activity android:name=".ReadActivity" />-->
+        <activity android:name=".dotActivity"></activity>
     </application>
 
 </manifest>
