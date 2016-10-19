@@ -1,10 +1,35 @@
-<kr.edcan.dispersionchart.DispersionChartView android:id="@+id/dpChartView"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:dotColor="#0000ff"
-    app:dotSize="4dp"
-    app:lineWidth="1dp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" />
+    android:orientation="vertical"
+    android:weightSum="10">
 
+    <kr.edcan.dispersionchart.DispersionChartView
+        android:id="@+id/dpChartView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="9"
+        app:dotColor="#33ff00ff"
+        app:dotSize="4dp"
+        app:lineColor="#807f44f4"
+        app:lineWidth="1dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            />
+
+
+    </LinearLayout>
+
+
+</LinearLayout>
 

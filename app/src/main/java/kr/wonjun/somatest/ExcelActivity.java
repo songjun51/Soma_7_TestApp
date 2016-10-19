@@ -111,10 +111,10 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public void onDestroy() {
-        super.onDestroy();
-        bt.stopService();
-    }
+//    public void onDestroy() {
+//        super.onDestroy();
+//        bt.stopService();
+//    }
 
     public void onStart() {
         super.onStart();
@@ -124,7 +124,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
             if (!bt.isServiceAvailable()) {
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
+//                setup();
             }
         }
     }

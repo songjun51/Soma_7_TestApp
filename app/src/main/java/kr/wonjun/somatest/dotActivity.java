@@ -18,12 +18,28 @@ public class dotActivity extends AppCompatActivity {
 
         DispersionChartView dpView = (DispersionChartView) findViewById(R.id.dpChartView);
 
-        dpView.addDot(new Dot(10f, 30f));
+        dpView.addDot(new Dot(10.1401f, 30f));
         dpView.addDot(new Dot(15f, 30f));
         dpView.addDot(new Dot(16f, 3f));
         dpView.addDot(new Dot(17f, 30f));
         dpView.addDot(new Dot(19f, 30f));
         dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));1
+        dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));
+        dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));
+        dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));
+        dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));
+        dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));
+        dpView.addDot(new Dot(50f, 50f));
+        dpView.addDot(new Dot(19f, 30f));
+        dpView.addDot(new Dot(50f, 50f));
+
+
     }
 
 
