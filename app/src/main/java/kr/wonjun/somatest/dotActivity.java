@@ -49,6 +49,7 @@ public class dotActivity extends AppCompatActivity {
 
 
                 dpView.addDot(new Dot(x, y));
+
             }
         });
 
