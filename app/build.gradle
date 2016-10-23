@@ -48,6 +48,7 @@ dependencies {
     compile 'com.akexorcist:bluetoothspp:1.0.0'
     compile fileTree(include: '*.jar', dir: 'libs')
     compile 'kr.edcan.dispersionchart:dispersion-chart:1.0@aar'
+    compile 'com.inuker.bluetooth:library:1.1.3'
 
 }
 
