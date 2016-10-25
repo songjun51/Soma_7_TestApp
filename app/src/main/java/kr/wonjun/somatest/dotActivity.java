@@ -78,8 +78,9 @@ public class dotActivity extends AppCompatActivity {
             @Override
             public void onDataReceived(byte[] data, String message) {
 
-                x = ((float) Float.parseFloat(message) + 1) * 50;
-                y = ((float) Float.parseFloat(message) + 1) * 50;
+                String[] bldata = message.split(",");
+                x = ((float) Float.parseFloat(String.valueOf(Integer.parseInt(bldata[0])/100)) + 1) * 50;
+                y = ((float) Float.parseFloat(String.valueOf(Integer.parseInt(bldata[1])/100)) + 1) * 50;
                 Toast.makeText(dotActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
 
                 if (start == true) {
@@ -142,7 +143,7 @@ public class dotActivity extends AppCompatActivity {
     }
 
     public void setup() {
-        bt.autoConnect("wnjungod");
+        bt.autoConnect("wnjun");
 
     }
 
