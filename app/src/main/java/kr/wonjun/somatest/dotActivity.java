@@ -1,34 +1,25 @@
 package kr.wonjun.somatest;
 
-import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
-
-import com.inuker.bluetooth.library.BluetoothClient;
-import com.inuker.bluetooth.library.connect.listener.BleConnectStatusListener;
-import com.inuker.bluetooth.library.connect.response.BleConnectResponse;
-import com.inuker.bluetooth.library.model.BleGattProfile;
-import com.inuker.bluetooth.library.search.SearchRequest;
-import com.inuker.bluetooth.library.search.SearchResult;
-import com.inuker.bluetooth.library.search.response.SearchResponse;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import kr.edcan.dispersionchart.DispersionChartView;
 import kr.edcan.dispersionchart.Dot;
 
-import static com.inuker.bluetooth.library.Constants.REQUEST_SUCCESS;
-import static com.inuker.bluetooth.library.Constants.STATUS_CONNECTED;
-import static com.inuker.bluetooth.library.Constants.STATUS_DISCONNECTED;
-
 public class dotActivity extends AppCompatActivity {
     float x, y;
     BluetoothSPP bt;
     DispersionChartView dpView;
+    boolean start = false;
+    Button addBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,24 +27,7 @@ public class dotActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dot);
 
         dpView = (DispersionChartView) findViewById(R.id.dpChartView);
-
-
-
-
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            @Override
-            public void onDataReceived(byte[] data, String message) {
-
-                x = ((float) Float.parseFloat(message) + 1) * 50;
-                y = ((float) Float.parseFloat(message) + 1) * 50;
-
-
-                dpView.addDot(new Dot(x, y));
-
-            }
-        });
-
-
+        addBtn = (Button) findViewById(R.id.activity_dot_btn);
 
         bt = new BluetoothSPP(this);
 
@@ -83,7 +57,7 @@ public class dotActivity extends AppCompatActivity {
             public void onDeviceConnectionFailed() {
             }
         });
-        setup();
+//        setup();
         bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
             public void onNewConnection(String name, String address) {
             }
@@ -97,38 +71,27 @@ public class dotActivity extends AppCompatActivity {
             public void onDataReceived(byte[] data, String message) {
 
 
-
-
-
-
             }
         });
 
+        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+            @Override
+            public void onDataReceived(byte[] data, String message) {
 
+                x = ((float) Float.parseFloat(message) + 1) * 50;
+                y = ((float) Float.parseFloat(message) + 1) * 50;
+                Toast.makeText(dotActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
 
-
-    }
-
-
-    public void onPause() {
-        super.onPause();
-        bt.stopService();
-    }
-
-    public void onStart() {
-        super.onStart();
-        if (!bt.isBluetoothEnabled()) {
-            bt.enable();
-        } else {
-            if (!bt.isServiceAvailable()) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
+                if (start == true) {
+                    dpView.addDot(new Dot(x, y));
+                    addBtn.setText("작동중, x : " + x + "y : " + y);
+                }
+                if (start == false)
+                    addBtn.setText("멈춤");
             }
-        }
-    }
-    public void setup() {
-        bt.autoConnect("wnjungod");
+
+        });
+
 
     }
 
@@ -160,8 +123,37 @@ public class dotActivity extends AppCompatActivity {
     }
 
 
+    public void onPause() {
+        super.onPause();
+        bt.stopService();
+    }
 
+    public void onStart() {
+        super.onStart();
+        if (!bt.isBluetoothEnabled()) {
+            bt.enable();
+        } else {
+            if (!bt.isServiceAvailable()) {
+                bt.setupService();
+                bt.startService(BluetoothState.DEVICE_OTHER);
+                setup();
+            }
+        }
+    }
 
+    public void setup() {
+        bt.autoConnect("wnjungod");
 
+    }
+
+    public void onClick(View v) {
+        if (start == true)
+            start = false;
+
+        else
+            start = true;
+        Toast.makeText(this, "버튼클릭됨.", Toast.LENGTH_SHORT).show();
+
+    }
 }
 

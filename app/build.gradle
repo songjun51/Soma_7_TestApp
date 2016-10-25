@@ -5,7 +5,7 @@ android {
     buildToolsVersion '24.0.2'
     defaultConfig {
         applicationId "kr.wonjun.somatest"
-        minSdkVersion 18
+        minSdkVersion 19
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -31,6 +31,9 @@ android {
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
     }
+    defaultConfig {
+        multiDexEnabled true
+    }
 
 }
 repositories {
@@ -48,8 +51,6 @@ dependencies {
     compile 'com.akexorcist:bluetoothspp:1.0.0'
     compile fileTree(include: '*.jar', dir: 'libs')
     compile 'kr.edcan.dispersionchart:dispersion-chart:1.0@aar'
-    compile 'com.inuker.bluetooth:library:1.1.3'
-
 }
 
 
