@@ -3,6 +3,7 @@ package kr.wonjun.somatest;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -14,12 +15,11 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 import kr.edcan.dispersionchart.DispersionChartView;
 import kr.edcan.dispersionchart.Dot;
 
-public class dotActivity extends AppCompatActivity {
-    float x, y;
+public class dotActivity extends AppCompatActivity implements View.OnClickListener {
     BluetoothSPP bt;
     DispersionChartView dpView;
     boolean start = false;
-    Button addBtn;
+    Button startBtn, stopBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +27,8 @@ public class dotActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dot);
 
         dpView = (DispersionChartView) findViewById(R.id.dpChartView);
-        addBtn = (Button) findViewById(R.id.activity_dot_btn);
+        startBtn = (Button) findViewById(R.id.activity_dot_start_btn);
+        stopBtn = (Button) findViewById(R.id.activity_dot_stop_btn);
 
         bt = new BluetoothSPP(this);
 
@@ -77,22 +78,37 @@ public class dotActivity extends AppCompatActivity {
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
-
-                String[] bldata = message.split(",");
-                x = ((float) Float.parseFloat(String.valueOf(Integer.parseInt(bldata[0])/100)) + 1) * 50;
-                y = ((float) Float.parseFloat(String.valueOf(Integer.parseInt(bldata[1])/100)) + 1) * 50;
-                Toast.makeText(dotActivity.this, x + "," + y, Toast.LENGTH_SHORT).show();
-
                 if (start == true) {
-                    dpView.addDot(new Dot(x, y));
-                    addBtn.setText("작동중, x : " + x + "y : " + y);
+                    String[] bldata = message.split(",");
+
+                    double temp1, temp2, temp3;
+
+                    double temp4, temp5, temp6;
+
+
+//                temp2= Integer.parseInt(bldata[1]);
+                    temp1 = Double.parseDouble(bldata[0]);
+                    temp4 = Double.parseDouble(bldata[1]);
+                    temp2 = temp1 / 100;
+                    temp5 = temp4 / 100;
+                    temp3 = (temp2 + 1) * 50;
+                    temp6 = (temp5 + 1) * 50;
+                    if (start == true) {
+                        startBtn.setText(temp3 + " , " + temp6);
+                        dpView.addDot(new Dot((float) temp3, (float) temp6));
+                        dpView.invalidate();
+                    }
                 }
-                if (start == false)
-                    addBtn.setText("멈춤");
+
             }
 
         });
 
+
+        startBtn.setOnClickListener(this);
+
+
+        stopBtn.setOnClickListener(this);
 
     }
 
@@ -143,18 +159,22 @@ public class dotActivity extends AppCompatActivity {
     }
 
     public void setup() {
-        bt.autoConnect("wnjun");
+        bt.autoConnect("wnjungod");
 
     }
 
     public void onClick(View v) {
-        if (start == true)
-            start = false;
+        switch (v.getId()) {
+            case R.id.activity_dot_start_btn:
+                start = true;
+                break;
 
-        else
-            start = true;
-        Toast.makeText(this, "버튼클릭됨.", Toast.LENGTH_SHORT).show();
+            case R.id.activity_dot_stop_btn:
+                start = false;
+                break;
+
+        }
 
     }
-}
 
+}
