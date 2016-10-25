@@ -20,7 +20,8 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     DispersionChartView dpView;
     boolean start = false;
     Button startBtn, stopBtn;
-
+    String[] dotColor;
+    int colorCnt=0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +30,6 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
         dpView = (DispersionChartView) findViewById(R.id.dpChartView);
         startBtn = (Button) findViewById(R.id.activity_dot_start_btn);
         stopBtn = (Button) findViewById(R.id.activity_dot_stop_btn);
-
         bt = new BluetoothSPP(this);
 
         if (!bt.isBluetoothAvailable())
@@ -80,7 +80,8 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
             public void onDataReceived(byte[] data, String message) {
                 if (start == true) {
                     String[] bldata = message.split(",");
-
+                    Log.e("asdf0",bldata[0]);
+                    Log.e("asdf1",bldata[1]);
                     double temp1, temp2, temp3;
 
                     double temp4, temp5, temp6;
@@ -94,9 +95,10 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                     temp3 = (temp2 + 1) * 50;
                     temp6 = (temp5 + 1) * 50;
                     if (start == true) {
-                        startBtn.setText(temp3 + " , " + temp6);
-                        dpView.addDot(new Dot((float) temp3, (float) temp6));
+                        startBtn.setText(temp2 + " , " + temp5);
+                        dpView.addDot(new Dot((float) temp3, (float) temp6,dotColor[colorCnt]));
                         dpView.invalidate();
+                        Log.e("asdf","x : "+temp3+" y : "+temp6+" dotColor : " +colorCnt);
                     }
                 }
 
@@ -109,6 +111,8 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
 
 
         stopBtn.setOnClickListener(this);
+
+        dotColor=getResources().getStringArray(R.array.dotColor);
 
     }
 
@@ -170,7 +174,11 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                 break;
 
             case R.id.activity_dot_stop_btn:
+                Log.e("asdf"," dotColor : " +colorCnt);
                 start = false;
+                colorCnt+=1;
+                if (colorCnt==8)
+                colorCnt=0;
                 break;
 
         }
