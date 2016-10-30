@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
@@ -19,9 +20,10 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     BluetoothSPP bt;
     DispersionChartView dpView;
     boolean start = false;
-    Button startBtn, stopBtn;
+    Button startBtn, stopBtn, resetBtn;
     String[] dotColor;
-    int colorCnt=0;
+    int colorCnt = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +32,7 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
         dpView = (DispersionChartView) findViewById(R.id.dpChartView);
         startBtn = (Button) findViewById(R.id.activity_dot_start_btn);
         stopBtn = (Button) findViewById(R.id.activity_dot_stop_btn);
+        resetBtn = (Button) findViewById(R.id.activity_dot_reset_btn);
         bt = new BluetoothSPP(this);
 
         if (!bt.isBluetoothAvailable())
@@ -78,42 +81,45 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             @Override
             public void onDataReceived(byte[] data, String message) {
+                Log.e("asdf","we have data");
                 if (start == true) {
                     String[] bldata = message.split(",");
-                    Log.e("asdf0",bldata[0]);
-                    Log.e("asdf1",bldata[1]);
+                    Log.e("asdf0", bldata[9]);
+                    Log.e("asdf1", bldata[10]);
                     double temp1, temp2, temp3;
 
                     double temp4, temp5, temp6;
 
+                    double temp7,temp8;
+
 
 //                temp2= Integer.parseInt(bldata[1]);
-                    temp1 = Double.parseDouble(bldata[0]);
-                    temp4 = Double.parseDouble(bldata[1]);
+                    temp1 = Double.parseDouble(bldata[9]);
+                    temp4 = Double.parseDouble(bldata[10]);
                     temp2 = temp1 / 100;
                     temp5 = temp4 / 100;
-                    temp3 = (temp2 + 1) * 50;
-                    temp6 = (temp5 + 1) * 50;
+//                    temp3 = (temp2 + 1) * 50;
+//                    temp6 = (temp5 + 1) * 50;
+                    temp3 = (temp2 * 5)+50;
+                    temp6 = (temp5 * 5)+50;
                     if (start == true) {
                         startBtn.setText(temp2 + " , " + temp5);
-                        dpView.addDot(new Dot((float) temp3, (float) temp6,dotColor[colorCnt]));
+                        dpView.addDot(new Dot((float) temp3, (float) temp6, dotColor[colorCnt]));
                         dpView.invalidate();
-                        Log.e("asdf","x : "+temp3+" y : "+temp6+" dotColor : " +colorCnt);
+                        Log.e("asdf", "x : " + temp3 + " y : " + temp6 + " dotColor : " + colorCnt);
                     }
                 }
 
             }
 
         });
-
+// -10 * 5
+        // 10 *5
 
         startBtn.setOnClickListener(this);
-
-
         stopBtn.setOnClickListener(this);
-
-        dotColor=getResources().getStringArray(R.array.dotColor);
-
+        dotColor = getResources().getStringArray(R.array.dotColor);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 
@@ -144,43 +150,46 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     }
 
 
-    public void onPause() {
-        super.onPause();
-        bt.stopService();
-    }
+//    public void onPause() {
+//        super.onPause();
+//        bt.stopService();
+//    }
 
-    public void onStart() {
-        super.onStart();
-        if (!bt.isBluetoothEnabled()) {
-            bt.enable();
-        } else {
-            if (!bt.isServiceAvailable()) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
-            }
-        }
-    }
+//    public void onStart() {
+//        super.onStart();
+//        if (!bt.isBluetoothEnabled()) {
+//            bt.enable();
+//        } else {.
+//            if (!bt.isServiceAvailable()) {
+//                bt.setupService();
+//                bt.startService(BluetoothState.DEVICE_OTHER);
+//                setup();
+//            }
+//        }
+//    }
 
-    public void setup() {
-        bt.autoConnect("wnjungod");
-
-    }
+//    public void setup() {
+//        bt.autoConnect("wnjungod");
+//
+//    }
 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_dot_start_btn:
                 start = true;
+                Log.e("asdf","on");
                 break;
 
             case R.id.activity_dot_stop_btn:
-                Log.e("asdf"," dotColor : " +colorCnt);
+                Log.e("asdf", " dotColor : " + colorCnt);
                 start = false;
-                colorCnt+=1;
-                if (colorCnt==8)
-                colorCnt=0;
+                colorCnt += 1;
+                if (colorCnt == 8)
+                    colorCnt = 0;
                 break;
-
+            case R.id.activity_dot_reset_btn:
+                dpView.deleteAllDots();
+                break;
         }
 
     }

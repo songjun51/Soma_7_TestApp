@@ -28,7 +28,7 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 
 public class ExcelActivity extends AppCompatActivity implements View.OnClickListener {
     int click = 0;
-    String[] btList = {"start", "0", "0", "0", "0", "0", "0", "0", "0", "0", "finish"};
+    String[] btList;
     BluetoothSPP bt;
     String receive;
     Button left, right, center, down, up, leftup, leftdown, rightup, rightdown, saveExcel, ReadBtn;
@@ -45,7 +45,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_execl);
-        bluetoothFirtSetting();
+//        bluetoothFirtSetting();
         firstExcelSetting();
         left = (Button) findViewById(R.id.activity_execl_btn_left);
         right = (Button) findViewById(R.id.activity_execl_btn_right);
@@ -69,8 +69,9 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         up.setOnClickListener(this);
         down.setOnClickListener(this);
 //        saveExcel.setOnClickListener(this);
+        bt=new BluetoothSPP(this);
 
-
+        btList=new String[11];
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
                 receive = message;
@@ -83,15 +84,15 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
                 tv.setText("" + receive);
 
 //                if(btList[0]=="@"||btList[10]=="!") {
-                leftup.setText(btList[1]);
-                up.setText(btList[2]);
-                rightup.setText(btList[3]);
-                left.setText(btList[4]);
-                center.setText(btList[5]);
-                right.setText(btList[6]);
-                leftdown.setText(btList[7]);
-                down.setText(btList[8]);
-                rightdown.setText(btList[9]);
+                leftup.setText(btList[0]);
+                up.setText(btList[1]);
+                rightup.setText(btList[2]);
+                left.setText(btList[3]);
+                center.setText(btList[4]);
+                right.setText(btList[5]);
+                leftdown.setText(btList[6]);
+                down.setText(btList[7]);
+                rightdown.setText(btList[8]);
 //                }
 //                else {
 //                    Toast.makeText(ExcelActivity.this, "에러!", Toast.LENGTH_SHORT).show();
@@ -111,10 +112,10 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-//    public void onDestroy() {
-//        super.onDestroy();
-//        bt.stopService();
-//    }
+    public void onDestroy() {
+        super.onDestroy();
+        bt.stopService();
+    }
 
     public void onStart() {
         super.onStart();
@@ -124,7 +125,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
             if (!bt.isServiceAvailable()) {
                 bt.setupService();
                 bt.startService(BluetoothState.DEVICE_OTHER);
-//                setup();
+                setup();
             }
         }
     }
@@ -346,31 +347,31 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         cell.setCellValue(click);
 
         cell = row.createCell(1);
-        cell.setCellValue(btList[1]);
+        cell.setCellValue(btList[0]);
 
         cell = row.createCell(2);
-        cell.setCellValue(btList[2]);
+        cell.setCellValue(btList[1]);
 
         cell = row.createCell(3);
-        cell.setCellValue(btList[3]);
+        cell.setCellValue(btList[2]);
 
         cell = row.createCell(4);
-        cell.setCellValue(btList[4]);
+        cell.setCellValue(btList[3]);
 
         cell = row.createCell(5);
-        cell.setCellValue(btList[5]);
+        cell.setCellValue(btList[4]);
 
         cell = row.createCell(6);
-        cell.setCellValue(btList[6]);
+        cell.setCellValue(btList[5]);
 
         cell = row.createCell(7);
-        cell.setCellValue(btList[7]);
+        cell.setCellValue(btList[6]);
 
         cell = row.createCell(8);
-        cell.setCellValue(btList[8]);
+        cell.setCellValue(btList[7]);
 
         cell = row.createCell(9);
-        cell.setCellValue(btList[9]);
+        cell.setCellValue(btList[8]);
         rowIdx++;
         Log.e("fuck", "값입력");
         saveExcleFile();
@@ -397,44 +398,44 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         Log.e("fuck", "저장완료");
     }
 
-    private void bluetoothFirtSetting() {
-        bt = new BluetoothSPP(this);
-
-        if (!bt.isBluetoothAvailable())
-
-        {
-            Toast.makeText(getApplicationContext()
-                    , "블루투스를 켜주세요"
-                    , Toast.LENGTH_SHORT).show();
-            finish();
-        }
-
-        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
-
-        {
-            public void onDeviceConnected(String name, String address) {
-                Toast.makeText(getApplicationContext()
-                        , "연결되었습니다", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onDeviceDisconnected() {
-                Toast.makeText(getApplicationContext()
-                        , "연결이끊겼습니다"
-                        , Toast.LENGTH_SHORT).show();
-            }
-
-            public void onDeviceConnectionFailed() {
-            }
-        });
-
-        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
-            public void onNewConnection(String name, String address) {
-            }
-
-            public void onAutoConnectionStarted() {
-            }
-        });
-    }
+//    private void bluetoothFirtSetting() {
+//        bt = new BluetoothSPP(this);
+//
+//        if (!bt.isBluetoothAvailable())
+//
+//        {
+//            Toast.makeText(getApplicationContext()
+//                    , "블루투스를 켜주세요"
+//                    , Toast.LENGTH_SHORT).show();
+//            finish();
+//        }
+//
+//        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
+//
+//        {
+//            public void onDeviceConnected(String name, String address) {
+//                Toast.makeText(getApplicationContext()
+//                        , "연결되었습니다", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            public void onDeviceDisconnected() {
+//                Toast.makeText(getApplicationContext()
+//                        , "연결이끊겼습니다"
+//                        , Toast.LENGTH_SHORT).show();
+//            }
+//
+//            public void onDeviceConnectionFailed() {
+//            }
+//        });
+//
+//        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
+//            public void onNewConnection(String name, String address) {
+//            }
+//
+//            public void onAutoConnectionStarted() {
+//            }
+//        });
+//    }
 }
 
 
