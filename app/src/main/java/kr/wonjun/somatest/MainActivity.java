@@ -229,10 +229,10 @@ public class MainActivity extends AppCompatActivity implements OnItemClickListen
 
     }
 
-//    public void onPause() {
-//        super.onPause();
-//        bt.stopService();
-//    }
+    public void onPause() {
+        super.onPause();
+        bt.stopService();
+    }
 
     public void onStart() {
         super.onStart();

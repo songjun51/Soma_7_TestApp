@@ -16,6 +16,8 @@ import app.akexorcist.bluetotohspp.library.BluetoothState;
 import kr.edcan.dispersionchart.DispersionChartView;
 import kr.edcan.dispersionchart.Dot;
 
+import static kr.wonjun.somatest.R.styleable.DispersionChartView;
+
 public class dotActivity extends AppCompatActivity implements View.OnClickListener {
     BluetoothSPP bt;
     DispersionChartView dpView;
@@ -84,13 +86,13 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                 Log.e("asdf","we have data");
                 if (start == true) {
                     String[] bldata = message.split(",");
-                    Log.e("asdf0", bldata[9]);
-                    Log.e("asdf1", bldata[10]);
+//                    Log.e("asdf0", bldata[9]);
+//                    Log.e("asdf1", bldata[10]);
                     double temp1, temp2, temp3;
 
                     double temp4, temp5, temp6;
 
-                    double temp7,temp8;
+                    double temp7 = 0,temp8=0.00;
 
 
 //                temp2= Integer.parseInt(bldata[1]);
@@ -101,12 +103,29 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
 //                    temp3 = (temp2 + 1) * 50;
 //                    temp6 = (temp5 + 1) * 50;
                     temp3 = (temp2 * 5)+50;
+
+
+
                     temp6 = (temp5 * 5)+50;
+
+                    if(temp6<0)
+                        temp8=temp6+Math.abs(temp6*2);
+                    else if(temp6>0)
+                        temp8=temp6-Math.abs(temp6*2);
+                    else if(temp6==0)
+                    temp8=0;
+//                    if(temp3<0)
+//                        temp7=temp3+(temp3*2);
+//                    else if(temp3>0)
+//                        temp7=temp3+50;
+//                    else if(temp3==0)
+//                        temp7=0;
+
                     if (start == true) {
-                        startBtn.setText(temp2 + " , " + temp5);
-                        dpView.addDot(new Dot((float) temp3, (float) temp6, dotColor[colorCnt]));
+                        startBtn.setText(Math.abs(temp8) + " , " + temp3);
+                        dpView.addDot(new Dot((float) temp8+100, (float) temp3, dotColor[colorCnt]));
                         dpView.invalidate();
-                        Log.e("asdf", "x : " + temp3 + " y : " + temp6 + " dotColor : " + colorCnt);
+                        Log.e("asdf", "x : " + temp8 + " y : " + temp3 + " dotColor : " + colorCnt);
                     }
                 }
 
@@ -150,28 +169,28 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     }
 
 
-//    public void onPause() {
-//        super.onPause();
-//        bt.stopService();
-//    }
+    public void onPause() {
+        super.onPause();
+        bt.stopService();
+    }
 
-//    public void onStart() {
-//        super.onStart();
-//        if (!bt.isBluetoothEnabled()) {
-//            bt.enable();
-//        } else {.
-//            if (!bt.isServiceAvailable()) {
-//                bt.setupService();
-//                bt.startService(BluetoothState.DEVICE_OTHER);
-//                setup();
-//            }
-//        }
-//    }
+    public void onStart() {
+        super.onStart();
+        if (!bt.isBluetoothEnabled()) {
+            bt.enable();
+        } else {
+            if (!bt.isServiceAvailable()) {
+                bt.setupService();
+                bt.startService(BluetoothState.DEVICE_OTHER);
+                setup();
+            }
+        }
+    }
 
-//    public void setup() {
-//        bt.autoConnect("wnjungod");
-//
-//    }
+    public void setup() {
+        bt.autoConnect("wnjungod");
+
+    }
 
     public void onClick(View v) {
         switch (v.getId()) {

@@ -69,9 +69,10 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         up.setOnClickListener(this);
         down.setOnClickListener(this);
 //        saveExcel.setOnClickListener(this);
-        bt=new BluetoothSPP(this);
 
-        btList=new String[11];
+
+        bt = new BluetoothSPP(this);
+
         bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
             public void onDataReceived(byte[] data, String message) {
                 receive = message;
@@ -112,23 +113,23 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    public void onDestroy() {
-        super.onDestroy();
-        bt.stopService();
-    }
+//    public void onDestroy() {
+//        super.onDestroy();
+//        bt.stopService();
+//    }
 
-    public void onStart() {
-        super.onStart();
-        if (!bt.isBluetoothEnabled()) {
-            bt.enable();
-        } else {
-            if (!bt.isServiceAvailable()) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
-            }
-        }
-    }
+//    public void onStart() {
+//        super.onStart();
+//        if (!bt.isBluetoothEnabled()) {
+//            bt.enable();
+//        } else {
+//            if (!bt.isServiceAvailable()) {
+//                bt.setupService();
+//                bt.startService(BluetoothState.DEVICE_OTHER);
+//                setup();
+//            }
+//        }
+//    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
