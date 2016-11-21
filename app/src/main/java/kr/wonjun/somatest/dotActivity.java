@@ -1,25 +1,59 @@
 package kr.wonjun.somatest;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
-import app.akexorcist.bluetotohspp.library.BluetoothSPP;
-import app.akexorcist.bluetotohspp.library.BluetoothState;
+import com.polidea.rxandroidble.RxBleClient;
+import com.polidea.rxandroidble.RxBleConnection;
+import com.polidea.rxandroidble.RxBleDevice;
+import com.polidea.rxandroidble.utils.ConnectionSharingAdapter;
+
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+
 import kr.edcan.dispersionchart.DispersionChartView;
 import kr.edcan.dispersionchart.Dot;
-
-import static kr.wonjun.somatest.R.styleable.DispersionChartView;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.PublishSubject;
 
 public class dotActivity extends AppCompatActivity implements View.OnClickListener {
-    BluetoothSPP bt;
+    //BLE
+    private static final String TAG = "BLE";
+    RxBleDevice device;
+    RxBleClient rxBleClient;
+    BluetoothPacket bluetoothPacket;
+    private Observable<RxBleConnection> connectionObservable;
+    private static final String macAddress = "88:4A:EA:76:BD:51";   // 기기를 찾기 위한 맥어드레스
+    // F4:B8:5E:F0:57:E5
+    UUID characteristicUUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");  // 통신을 위한 UUID
+    Timer timer;
+
+    TimerTask timerTask = new TimerTask() {
+        public void run() {
+            Log.d(TAG, "실시간모드 요청 패킷 전송");
+            if (isBluetoothConnected()) {
+                connectionObservable
+                        .flatMap(rxBleConnection -> rxBleConnection.writeCharacteristic(characteristicUUID, bluetoothPacket.makeRealTimeModePacket()))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(bytes -> {
+                            Log.d(TAG, "실시간모드 전송 성공");
+                        }, throwable -> {
+                            Log.d(TAG, "실시간모드 전송 실패" + throwable);
+                        });
+            }
+        }
+    };
+
+
     DispersionChartView dpView;
     boolean start = false;
     Button startBtn, stopBtn, resetBtn;
@@ -35,105 +69,25 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
         startBtn = (Button) findViewById(R.id.activity_dot_start_btn);
         stopBtn = (Button) findViewById(R.id.activity_dot_stop_btn);
         resetBtn = (Button) findViewById(R.id.activity_dot_reset_btn);
-        bt = new BluetoothSPP(this);
 
-        if (!bt.isBluetoothAvailable())
+        // BLE 관련입니다.
+        bluetoothPacket = new BluetoothPacket();
+        rxBleClient = RxBleClient.create(getApplicationContext());
+        device = rxBleClient.getBleDevice(macAddress);  // 디바이스를 얻어옵니다.
+        PublishSubject<Void> disconnectTriggerSubject = PublishSubject.create();
 
-        {
-            Toast.makeText(getApplicationContext()
-                    , "블루투스를 켜주세요"
-                    , Toast.LENGTH_SHORT).show();
-            finish();
-        }
+        // 디바이스의 연결을 공유하는 connectionObservable. 이것을 활용해서 나중에 읽기 쓰기를 합니다.
+        connectionObservable = device
+                .establishConnection(getApplicationContext(), true) // 오른쪽 boolean 인자는 자동연결 관련입니다.
+                .observeOn(AndroidSchedulers.mainThread())
+                .takeUntil(disconnectTriggerSubject)
+                .compose(new ConnectionSharingAdapter());
 
-        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
+        setBluetoothConnect();  // 블루투스 연결을 실제로 시작
+        setBluetoothRead();     // 블루투스 읽기를 시작
 
-        {
-            public void onDeviceConnected(String name, String address) {
-                Toast.makeText(getApplicationContext()
-                        , "연결되었습니다", Toast.LENGTH_SHORT).show();
-            }
-
-            public void onDeviceDisconnected() {
-                Toast.makeText(getApplicationContext()
-                        , "연결이끊겼습니다"
-                        , Toast.LENGTH_SHORT).show();
-            }
-
-            public void onDeviceConnectionFailed() {
-            }
-        });
-//        setup();
-        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
-            public void onNewConnection(String name, String address) {
-            }
-
-            public void onAutoConnectionStarted() {
-            }
-        });
-
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            @Override
-            public void onDataReceived(byte[] data, String message) {
-
-
-            }
-        });
-
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            @Override
-            public void onDataReceived(byte[] data, String message) {
-                Log.e("asdf","we have data");
-                if (start == true) {
-                    String[] bldata = message.split(",");
-//                    Log.e("asdf0", bldata[9]);
-//                    Log.e("asdf1", bldata[10]);
-                    double temp1, temp2, temp3;
-
-                    double temp4, temp5, temp6;
-
-                    double temp7 = 0,temp8=0.00;
-
-
-//                temp2= Integer.parseInt(bldata[1]);
-                    temp1 = Double.parseDouble(bldata[9]);
-                    temp4 = Double.parseDouble(bldata[10]);
-                    temp2 = temp1 / 100;
-                    temp5 = temp4 / 100;
-//                    temp3 = (temp2 + 1) * 50;
-//                    temp6 = (temp5 + 1) * 50;
-                    temp3 = (temp2 * 5)+50;
-
-
-
-                    temp6 = (temp5 * 5)+50;
-
-                    if(temp6<0)
-                        temp8=temp6+Math.abs(temp6*2);
-                    else if(temp6>0)
-                        temp8=temp6-Math.abs(temp6*2);
-                    else if(temp6==0)
-                    temp8=0;
-//                    if(temp3<0)
-//                        temp7=temp3+(temp3*2);
-//                    else if(temp3>0)
-//                        temp7=temp3+50;
-//                    else if(temp3==0)
-//                        temp7=0;
-
-                    if (start == true) {
-                        startBtn.setText(Math.abs(temp8) + " , " + temp3);
-                        dpView.addDot(new Dot((float) temp8+100, (float) temp3, dotColor[colorCnt]));
-                        dpView.invalidate();
-                        Log.e("asdf", "x : " + temp8 + " y : " + temp3 + " dotColor : " + colorCnt);
-                    }
-                }
-
-            }
-
-        });
-// -10 * 5
-        // 10 *5
+        timer = new Timer();
+        timer.schedule(timerTask, 1000, 3000);
 
         startBtn.setOnClickListener(this);
         stopBtn.setOnClickListener(this);
@@ -171,25 +125,10 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
 
     public void onPause() {
         super.onPause();
-        bt.stopService();
     }
 
     public void onStart() {
         super.onStart();
-        if (!bt.isBluetoothEnabled()) {
-            bt.enable();
-        } else {
-            if (!bt.isServiceAvailable()) {
-                bt.setupService();
-                bt.startService(BluetoothState.DEVICE_OTHER);
-                setup();
-            }
-        }
-    }
-
-    public void setup() {
-        bt.autoConnect("wnjungod");
-
     }
 
     public void onClick(View v) {
@@ -211,6 +150,69 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                 break;
         }
 
+    }
+
+    public boolean isBluetoothConnected(){
+        return device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
+    }
+
+    public void setBluetoothConnect(){
+        connectionObservable.subscribe(
+                characteristicValue -> {
+                    // Read characteristic value.
+                    Log.d(TAG, "블루투스가 연결되었다.");
+                },
+                throwable -> {
+                    // Handle an error here.
+                    Log.d(TAG, "블루투스가 연결 실패. 내용 : " + throwable);
+                    Log.d(TAG, "재연결을 시도합니다.");
+                    setBluetoothConnect();
+                }
+        );
+    }
+
+    public void setBluetoothRead(){
+        // read 와 관련된 부분입니다. 리스너라고 생각하세요.
+        connectionObservable.flatMap(rxBleConnection -> rxBleConnection.setupNotification(characteristicUUID))
+                .doOnNext(notificationObservable -> {
+                    // Notification has been set up
+                    // 리스너가 세팅된 후 동작을 여기에 적습니다.
+                })
+                .flatMap(notificationObservable -> notificationObservable) // <-- Notification has been set up, now observe value changes.
+                .subscribe(
+                        bytes -> {
+                            // Given characteristic has been changes, here is the value.// Given characteristic has been changes, here is the value.
+                            Log.d(TAG, "값이 들어왔습니다.");
+                            bluetoothPacket.decodePacket(bytes); // 패킷을 디코딩한다.
+                            if(bluetoothPacket.getIsPacketCompleted()) { // 패킷이 완성되었다면
+                                Log.d(TAG, "패킷을 처리합니다.");
+                                if (start == true) {
+                                    double[] coordinates = bluetoothPacket.getPosition();
+
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable(){
+                                                @Override
+                                                public void run() {
+                                                    // 해당 작업을 처리함
+                                                    startBtn.setText(bluetoothPacket.getPosition()[0] + " , " + bluetoothPacket.getPosition()[1]);
+                                                    dpView.addDot(new Dot((float)coordinates[0], (float)coordinates[1], dotColor[colorCnt]));
+                                                    dpView.invalidate();
+                                                }
+                                            });
+                                        }
+                                    }).start();
+
+                                }
+                            }
+                        },
+                        throwable -> {
+                            Log.d(TAG, "read에 예외가 발생했습니다. 내용 : " + throwable);
+                            Log.d(TAG, "Read 재연결을 시도합니다.");
+                            setBluetoothRead();
+                        }
+                );
     }
 
 }

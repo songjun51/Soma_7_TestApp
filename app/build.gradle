@@ -1,4 +1,15 @@
 apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+    }
+}
 
 android {
     compileSdkVersion 24
@@ -16,6 +27,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     productFlavors {
     }
@@ -35,6 +50,18 @@ android {
         multiDexEnabled true
     }
 
+    dexOptions {
+
+        // dex의 크기를 늘리기 위한 설정(2^16개 초과)
+
+        jumboMode true
+
+        // 앱 구동 시 자바 할당 힙을 지정
+
+        javaMaxHeapSize "4g"
+
+    }
+
 }
 repositories {
     flatDir {
@@ -51,6 +78,7 @@ dependencies {
     compile 'com.akexorcist:bluetoothspp:1.0.0'
     compile fileTree(include: '*.jar', dir: 'libs')
     compile 'kr.edcan.dispersionchart:dispersion-chart:1.0@aar'
+    compile "com.polidea.rxandroidble:rxandroidble:1.0.2" // BLE
 }
 
 
