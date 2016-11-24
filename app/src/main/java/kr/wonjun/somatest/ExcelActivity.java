@@ -9,13 +9,22 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.polidea.rxandroidble.RxBleClient;
+import com.polidea.rxandroidble.RxBleConnection;
+import com.polidea.rxandroidble.RxBleDevice;
+import com.polidea.rxandroidble.utils.ConnectionSharingAdapter;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -25,9 +34,14 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
+import kr.edcan.dispersionchart.Dot;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.PublishSubject;
 
 public class ExcelActivity extends AppCompatActivity implements View.OnClickListener {
     int click = 0;
+    private static final String TAG = "BLE";
     String[] btList;
     BluetoothSPP bt;
     String receive;
@@ -40,6 +54,34 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     Row row = null;
     File file;
     TextView tv;
+
+    int[] coordinates;
+
+
+    RxBleDevice device;
+    RxBleClient rxBleClient;
+    BluetoothPacket bluetoothPacket;
+    private Observable<RxBleConnection> connectionObservable;
+    private static final String macAddress = "20:CD:39:7B:FC:5F";   // 기기를 찾기 위한 맥어드레스
+    // F4:B8:5E:F0:57:E5
+    UUID characteristicUUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");  // 통신을 위한 UUID
+    Timer timer;
+
+    TimerTask timerTask = new TimerTask() {
+        public void run() {
+            Log.d(TAG, "실시간모드 요청 패킷 전송");
+            if (isBluetoothConnected()) {
+                connectionObservable
+                        .flatMap(rxBleConnection -> rxBleConnection.writeCharacteristic(characteristicUUID, bluetoothPacket.makeRealTimeModePacket()))
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(bytes -> {
+                            Log.d(TAG, "실시간모드 전송 성공");
+                        }, throwable -> {
+                            Log.d(TAG, "실시간모드 전송 실패" + throwable);
+                        });
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,65 +113,61 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
 //        saveExcel.setOnClickListener(this);
 
 
-        bt = new BluetoothSPP(this);
+        // BLE 관련입니다.
+        bluetoothPacket = new BluetoothPacket();
+        rxBleClient = RxBleClient.create(getApplicationContext());
+        device = rxBleClient.getBleDevice(macAddress);  // 디바이스를 얻어옵니다.
+        PublishSubject<Void> disconnectTriggerSubject = PublishSubject.create();
 
-        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
-            public void onDataReceived(byte[] data, String message) {
-                receive = message;
-                String[] bldata = message.split(",");
+        // 디바이스의 연결을 공유하는 connectionObservable. 이것을 활용해서 나중에 읽기 쓰기를 합니다.
+        connectionObservable = device
+                .establishConnection(getApplicationContext(), true) // 오른쪽 boolean 인자는 자동연결 관련입니다.
+                .observeOn(AndroidSchedulers.mainThread())
+                .takeUntil(disconnectTriggerSubject)
+                .compose(new ConnectionSharingAdapter());
 
-                for (int i = 0; i < bldata.length; i++) {
-                    btList[i] = bldata[i];
-                }
-                Log.e("asdf", message);
-                tv.setText("" + receive);
+        setBluetoothConnect();  // 블루투스 연결을 실제로 시작
+        setBluetoothRead();     // 블루투스 읽기를 시작
 
-//                if(btList[0]=="@"||btList[10]=="!") {
-                leftup.setText(btList[0]);
-                up.setText(btList[1]);
-                rightup.setText(btList[2]);
-                left.setText(btList[3]);
-                center.setText(btList[4]);
-                right.setText(btList[5]);
-                leftdown.setText(btList[6]);
-                down.setText(btList[7]);
-                rightdown.setText(btList[8]);
-//                }
-//                else {
-//                    Toast.makeText(ExcelActivity.this, "에러!", Toast.LENGTH_SHORT).show();
-//                }
-//                    AlertDialog.Builder dialog = new AlertDialog.Builder(getApplicationContext());
-//                    dialog.setTitle("에러!");
-//                    dialog.setMessage("에러가 계속된다면 다음 화면을 캡쳐해 A/S센터에 문의해주세요 Tel : 010-3256-8530);\n에러사항 : "+message);
-//                    dialog.show();
-//
-//
-//                }
+        timer = new Timer();
+        timer.schedule(timerTask, 1000, 3000);
 
-
-            }
-        });
-
+//        startBtn.setOnClickListener(this);
+//        stopBtn.setOnClickListener(this);
+//        dotColor = getResources().getStringArray(R.array.dotColor);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
 
-//    public void onDestroy() {
-//        super.onDestroy();
-//        bt.stopService();
+//        bt.setOnDataReceivedListener(new BluetoothSPP.OnDataReceivedListener() {
+//            public void onDataReceived(byte[] data, String message) {
+//                receive = message;
+//                String[] bldata = message.split(",");
+//
+//                for (int i = 0; i < bldata.length; i++) {
+//                    btList[i] = bldata[i];
+//                }
+//                Log.e("asdf", message);
+//                tv.setText("" + receive);
+//
+////                if(btList[0]=="@"||btList[10]=="!") {
+//                leftup.setText(btList[0]);
+//                up.setText(btList[1]);
+//                rightup.setText(btList[2]);
+//                left.setText(btList[3]);
+//                center.setText(btList[4]);
+//                right.setText(btList[5]);
+//                leftdown.setText(btList[6]);
+//                down.setText(btList[7]);
+//                rightdown.setText(btList[8]);
+//
+//
+//
+//            }
+//        });
+
 //    }
 
-//    public void onStart() {
-//        super.onStart();
-//        if (!bt.isBluetoothEnabled()) {
-//            bt.enable();
-//        } else {
-//            if (!bt.isServiceAvailable()) {
-//                bt.setupService();
-//                bt.startService(BluetoothState.DEVICE_OTHER);
-//                setup();
-//            }
-//        }
-//    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == BluetoothState.REQUEST_CONNECT_DEVICE) {
@@ -147,10 +185,6 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    public void setup() {
-        bt.autoConnect("wnjungod");
-
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -170,7 +204,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         } else if (id == R.id.menu_item_excel) {
             startActivity(new Intent(getApplicationContext(), ExcelActivity.class));
             return true;
-        }else if (id == R.id.menu_item_dot) {
+        } else if (id == R.id.menu_item_dot) {
             startActivity(new Intent(getApplicationContext(), dotActivity.class));
             return true;
         }
@@ -217,89 +251,6 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         cell.setCellValue("RightDown");
     }
 
-//    private boolean saveExcelFile(Context context, String fileName) {
-//
-//        // New Workbook
-//
-//
-//        // Generate column headings
-//        row = sheet1.createRow(0);
-//
-//        cell = row.createCell(0);
-//        cell.setCellValue("status");
-//
-//        cell = row.createCell(1);
-//        cell.setCellValue("LeftUp");
-//
-//        cell = row.createCell(2);
-//        cell.setCellValue("Up");
-//
-//        cell = row.createCell(3);
-//        cell.setCellValue("RightUp");
-//
-//        cell = row.createCell(4);
-//        cell.setCellValue("Left");
-//
-//        cell = row.createCell(5);
-//        cell.setCellValue("Center");
-//
-//        cell = row.createCell(6);
-//        cell.setCellValue("Right");
-//
-//        cell = row.createCell(7);
-//        cell.setCellValue("LeftDown");
-//
-//        cell = row.createCell(8);
-//        cell.setCellValue("Down");
-//
-//        cell = row.createCell(9);
-//        cell.setCellValue("RightDown");
-//
-//
-////        CustomVo vo;
-//
-//
-//        row = sheet1.createRow(rowIdx);
-//
-//
-//        cell = row.createCell(0);
-//        cell.setCellValue(click);
-//
-//        cell = row.createCell(1);
-//        cell.setCellValue("1");
-//
-//        cell = row.createCell(2);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(3);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(4);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(5);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(6);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(7);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(8);
-//        cell.setCellValue("2");
-//
-//        cell = row.createCell(9);
-//        cell.setCellValue("2");
-//        rowIdx++;
-//
-//
-//        // Create a path where we will place our List of objects on external
-//        // storage
-//        return true;
-//
-//    }
-
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.activity_execl_btn_left:
@@ -343,36 +294,38 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
 
 
     private void writebt() {
+
+
         row = sheet1.createRow(rowIdx);
         cell = row.createCell(0);
         cell.setCellValue(click);
 
         cell = row.createCell(1);
-        cell.setCellValue(btList[0]);
+        cell.setCellValue(coordinates[0]);
 
         cell = row.createCell(2);
-        cell.setCellValue(btList[1]);
+        cell.setCellValue(coordinates[1]);
 
         cell = row.createCell(3);
-        cell.setCellValue(btList[2]);
+        cell.setCellValue(coordinates[2]);
 
         cell = row.createCell(4);
-        cell.setCellValue(btList[3]);
+        cell.setCellValue(coordinates[3]);
 
         cell = row.createCell(5);
-        cell.setCellValue(btList[4]);
+        cell.setCellValue(coordinates[4]);
 
         cell = row.createCell(6);
-        cell.setCellValue(btList[5]);
+        cell.setCellValue(coordinates[5]);
 
         cell = row.createCell(7);
-        cell.setCellValue(btList[6]);
+        cell.setCellValue(coordinates[6]);
 
         cell = row.createCell(8);
-        cell.setCellValue(btList[7]);
+        cell.setCellValue(coordinates[7]);
 
         cell = row.createCell(9);
-        cell.setCellValue(btList[8]);
+        cell.setCellValue(coordinates[8]);
         rowIdx++;
         Log.e("fuck", "값입력");
         saveExcleFile();
@@ -399,44 +352,78 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         Log.e("fuck", "저장완료");
     }
 
-//    private void bluetoothFirtSetting() {
-//        bt = new BluetoothSPP(this);
-//
-//        if (!bt.isBluetoothAvailable())
-//
-//        {
-//            Toast.makeText(getApplicationContext()
-//                    , "블루투스를 켜주세요"
-//                    , Toast.LENGTH_SHORT).show();
-//            finish();
-//        }
-//
-//        bt.setBluetoothConnectionListener(new BluetoothSPP.BluetoothConnectionListener()
-//
-//        {
-//            public void onDeviceConnected(String name, String address) {
-//                Toast.makeText(getApplicationContext()
-//                        , "연결되었습니다", Toast.LENGTH_SHORT).show();
-//            }
-//
-//            public void onDeviceDisconnected() {
-//                Toast.makeText(getApplicationContext()
-//                        , "연결이끊겼습니다"
-//                        , Toast.LENGTH_SHORT).show();
-//            }
-//
-//            public void onDeviceConnectionFailed() {
-//            }
-//        });
-//
-//        bt.setAutoConnectionListener(new BluetoothSPP.AutoConnectionListener() {
-//            public void onNewConnection(String name, String address) {
-//            }
-//
-//            public void onAutoConnectionStarted() {
-//            }
-//        });
-//    }
+    public boolean isBluetoothConnected() {
+        return device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
+    }
+
+    public void setBluetoothConnect() {
+        connectionObservable.subscribe(
+                characteristicValue -> {
+                    // Read characteristic value.
+                    Log.d(TAG, "블루투스가 연결되었다.");
+                },
+                throwable -> {
+                    // Handle an error here.
+                    Log.d(TAG, "블루투스가 연결 실패. 내용 : " + throwable);
+                    Log.d(TAG, "재연결을 시도합니다.");
+                    setBluetoothConnect();
+                }
+        );
+    }
+
+
+    public void setBluetoothRead() {
+        // read 와 관련된 부분입니다. 리스너라고 생각하세요.
+        connectionObservable.flatMap(rxBleConnection -> rxBleConnection.setupNotification(characteristicUUID))
+                .doOnNext(notificationObservable -> {
+                    // Notification has been set up
+                    // 리스너가 세팅된 후 동작을 여기에 적습니다.
+                })
+                .flatMap(notificationObservable -> notificationObservable) // <-- Notification has been set up, now observe value changes.
+                .subscribe(
+                        bytes -> {
+                            // Given characteristic has been changes, here is the value.// Given characteristic has been changes, here is the value.
+                            Log.d(TAG, "값이 들어왔습니다.");
+                            bluetoothPacket.decodePacket(bytes); // 패킷을 디코딩한다.
+                            if (bluetoothPacket.getIsPacketCompleted()) { // 패킷이 완성되었다면
+                                Log.d(TAG, "패킷을 처리합니다.");
+
+
+
+                                    new Thread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            runOnUiThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    coordinates = bluetoothPacket.getValue();
+                                                    leftup.setText(String.valueOf(coordinates[0]));
+                                                    up.setText(String.valueOf(coordinates[1]));
+                                                    rightup.setText(String.valueOf(coordinates[2]));
+                                                    left.setText(String.valueOf(coordinates[3]));
+                                                    center.setText(String.valueOf(coordinates[4]));
+                                                    right.setText(String.valueOf(coordinates[5]));
+                                                    leftdown.setText(String.valueOf(coordinates[6]));
+                                                    down.setText(String.valueOf(coordinates[7]));
+                                                    rightdown.setText(String.valueOf(coordinates[8]));
+
+                                                    Log.e("asdf","good");
+                                                }
+                                            });
+                                        }
+                                    }).start();
+
+
+                            }
+                        },
+                        throwable -> {
+                            Log.d(TAG, "read에 예외가 발생했습니다. 내용 : " + throwable);
+                            Log.d(TAG, "Read 재연결을 시도합니다.");
+                            setBluetoothRead();
+                        }
+                );
+    }
+
 }
 
 

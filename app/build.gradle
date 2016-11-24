@@ -47,7 +47,7 @@ android {
         exclude 'META-INF/LGPL2.1'
     }
     defaultConfig {
-        multiDexEnabled true
+//        multiDexEnabled true
     }
 
     dexOptions {

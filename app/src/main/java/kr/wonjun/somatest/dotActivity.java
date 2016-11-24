@@ -32,8 +32,8 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     RxBleClient rxBleClient;
     BluetoothPacket bluetoothPacket;
     private Observable<RxBleConnection> connectionObservable;
-    private static final String macAddress = "88:4A:EA:76:BD:51";   // 기기를 찾기 위한 맥어드레스
-    // F4:B8:5E:F0:57:E5
+    private static final String macAddress = "20:CD:39:7B:FC:5F";   // 기기를 찾기 위한 맥어드레스
+    // F4:B8:5E:F0:57:E5  20:CD:39:7B:FC:5F
     UUID characteristicUUID = UUID.fromString("0000ffe1-0000-1000-8000-00805f9b34fb");  // 통신을 위한 UUID
     Timer timer;
 
@@ -135,28 +135,30 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
         switch (v.getId()) {
             case R.id.activity_dot_start_btn:
                 start = true;
-                Log.e("asdf","on");
+                Log.e("asdf", "on");
                 break;
 
             case R.id.activity_dot_stop_btn:
                 Log.e("asdf", " dotColor : " + colorCnt);
                 start = false;
                 colorCnt += 1;
-                if (colorCnt == 8)
+                if (colorCnt == 7)
                     colorCnt = 0;
                 break;
             case R.id.activity_dot_reset_btn:
                 dpView.deleteAllDots();
+                dpView.invalidate();
+                Log.e("dot", "모든닷삭제");
                 break;
         }
 
     }
 
-    public boolean isBluetoothConnected(){
+    public boolean isBluetoothConnected() {
         return device.getConnectionState() == RxBleConnection.RxBleConnectionState.CONNECTED;
     }
 
-    public void setBluetoothConnect(){
+    public void setBluetoothConnect() {
         connectionObservable.subscribe(
                 characteristicValue -> {
                     // Read characteristic value.
@@ -171,7 +173,7 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
         );
     }
 
-    public void setBluetoothRead(){
+    public void setBluetoothRead() {
         // read 와 관련된 부분입니다. 리스너라고 생각하세요.
         connectionObservable.flatMap(rxBleConnection -> rxBleConnection.setupNotification(characteristicUUID))
                 .doOnNext(notificationObservable -> {
@@ -184,7 +186,7 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                             // Given characteristic has been changes, here is the value.// Given characteristic has been changes, here is the value.
                             Log.d(TAG, "값이 들어왔습니다.");
                             bluetoothPacket.decodePacket(bytes); // 패킷을 디코딩한다.
-                            if(bluetoothPacket.getIsPacketCompleted()) { // 패킷이 완성되었다면
+                            if (bluetoothPacket.getIsPacketCompleted()) { // 패킷이 완성되었다면
                                 Log.d(TAG, "패킷을 처리합니다.");
                                 if (start == true) {
                                     double[] coordinates = bluetoothPacket.getPosition();
@@ -192,13 +194,59 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                                     new Thread(new Runnable() {
                                         @Override
                                         public void run() {
-                                            runOnUiThread(new Runnable(){
+                                            runOnUiThread(new Runnable() {
                                                 @Override
                                                 public void run() {
                                                     // 해당 작업을 처리함
-                                                    startBtn.setText(bluetoothPacket.getPosition()[0] + " , " + bluetoothPacket.getPosition()[1]);
-                                                    dpView.addDot(new Dot((float)coordinates[0], (float)coordinates[1], dotColor[colorCnt]));
-                                                    dpView.invalidate();
+                                                    double x = bluetoothPacket.getPosition()[0];
+                                                    double y = bluetoothPacket.getPosition()[1];
+                                                    if (x == -2.0 && y == -2.0 || x == -3.0 && y == 2.0 || x == 6.5 && y == -8.5 || x == -7.0 && y == -1.25 || x == 4.33 && y == 6.66 || x == 1.0 && y == -9.0 || x == 1.33 && y == -4.83 || x == -0.66 && y == -0.66
+                                                            || x == -1.0 && y == -2.33 || x == -5.0 && y == -1.0 || x == -5.0 && y == -4.75 || x == -1.0 && y == 2.5 || x == -4.0 && y == -6.33 || x == 9.33 && y == -0.66 || x == 9.33 && y == -0.66)
+                                                        Log.e("dot", "초기값 예외발생");
+                                                    else {
+
+                                                        /*
+                                                        x *= 5;
+                                                        y *= 5;
+
+                                                        if (x < 0) {
+                                                            x = x + Math.abs(x * 2);
+                                                        } else {
+                                                            x = x + 50;
+                                                        }
+                                                        if (y < 0) {
+                                                            y = x + Math.abs(y * 2);
+                                                        } else {
+                                                            y = y + 50;
+                                                        }
+                                                        */
+
+//                                                        x = x + 2.2;
+//                                                        y = y + 2;
+//                                                        x = x * 20;
+//                                                        y = y * 20;
+
+                                                        if (y < 0) {
+                                                            y = y + Math.abs(y * 2);
+                                                        } else {
+                                                            y = y -y*2;
+                                                        }
+
+                                                        x = x + 5;
+                                                        y = y + 5;
+                                                        x = x * 10;
+                                                        y = y * 10;
+
+
+
+                                                        startBtn.setText(y + " , " + x);
+
+
+                                                        dpView.addDot(new Dot((float) y, (float) x, dotColor[colorCnt]));
+                                                        dpView.invalidate();
+                                                        Log.e("dot", "dot찍힘");
+
+                                                    }
                                                 }
                                             });
                                         }
