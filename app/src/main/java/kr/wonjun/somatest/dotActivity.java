@@ -54,7 +54,7 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     };
 
 
-    DispersionChartView dpView;
+    DispersionChartView dpView; // 특제소스 넣어만든 라이브러리!
     boolean start = false;
     Button startBtn, stopBtn, resetBtn;
     String[] dotColor;
@@ -103,7 +103,7 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) { // 여러 테스트 넘어다니기 위한 메뉴
         int id = item.getItemId();
         if (id == R.id.menu_item_write) {
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
@@ -133,7 +133,7 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
 
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.activity_dot_start_btn:
+            case R.id.activity_dot_start_btn: // 시작 상태로 변경
                 start = true;
                 Log.e("asdf", "on");
                 break;
@@ -144,12 +144,12 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                 colorCnt += 1;
                 if (colorCnt == 7)
                     colorCnt = 0;
-                break;
+                break; // 멈추기, dotColor 변경 colorCnt은 xml에 배열로 저장해둠
             case R.id.activity_dot_reset_btn:
                 dpView.deleteAllDots();
                 dpView.invalidate();
                 Log.e("dot", "모든닷삭제");
-                break;
+                break;// dot 삭제
         }
 
     }
@@ -235,16 +235,16 @@ public class dotActivity extends AppCompatActivity implements View.OnClickListen
                                                         x = x + 5;
                                                         y = y + 5;
                                                         x = x * 10;
-                                                        y = y * 10;
+                                                        y = y * 10; // 방석에 맞게끔 변동값들, 상하좌우 변경등 수정값
 
 
 
-                                                        startBtn.setText(y + " , " + x);
+                                                        startBtn.setText(y + " , " + x); // x,y값을 숫자로 표시해주기
 
 
-                                                        dpView.addDot(new Dot((float) y, (float) x, dotColor[colorCnt]));
-                                                        dpView.invalidate();
-                                                        Log.e("dot", "dot찍힘");
+                                                        dpView.addDot(new Dot((float) y, (float) x, dotColor[colorCnt])); // dot찍기. x,y축, color 설정 가능
+                                                        dpView.invalidate();// 화면 갱신
+                                                        Log.e("dot", "dot찍힘"); // 로그
 
                                                     }
                                                 }

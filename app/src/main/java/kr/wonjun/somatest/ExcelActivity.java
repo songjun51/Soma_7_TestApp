@@ -42,9 +42,7 @@ import rx.subjects.PublishSubject;
 public class ExcelActivity extends AppCompatActivity implements View.OnClickListener {
     int click = 0;
     private static final String TAG = "BLE";
-    String[] btList;
     BluetoothSPP bt;
-    String receive;
     Button left, right, center, down, up, leftup, leftdown, rightup, rightdown, saveExcel, ReadBtn;
 
     Workbook wb;
@@ -212,9 +210,9 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         return super.onOptionsItemSelected(item);
     }
 
-    private void firstExcelSetting() {
-        file = new File(this.getExternalFilesDir(null), "myExcel.xls");
-        wb = new HSSFWorkbook();
+    private void firstExcelSetting() { //  처음 엑셀파일 저장시 맨위 셀에 값 넣어주기
+        file = new File(this.getExternalFilesDir(null), "myExcel.xls"); //파일명 지정
+        wb = new HSSFWorkbook();// 파일 확장자 지정
         // New Sheet
         sheet1 = wb.createSheet("Shit1");
 
@@ -251,7 +249,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         cell.setCellValue("RightDown");
     }
 
-    public void onClick(View v) {
+    public void onClick(View v) { // status값 지정
         switch (v.getId()) {
             case R.id.activity_execl_btn_left:
                 click = 4;
@@ -293,7 +291,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
     }
 
 
-    private void writebt() {
+    private void writebt() { // 엑셀에 저장
 
 
         row = sheet1.createRow(rowIdx);
@@ -331,7 +329,7 @@ public class ExcelActivity extends AppCompatActivity implements View.OnClickList
         saveExcleFile();
     }
 
-    private void saveExcleFile() {
+    private void saveExcleFile() { // 엑셀 저장, 예외처리
         FileOutputStream os = null;
         try {
             os = new FileOutputStream(file);

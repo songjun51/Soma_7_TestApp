@@ -18,7 +18,7 @@ import app.akexorcist.bluetotohspp.library.BluetoothSPP;
 import app.akexorcist.bluetotohspp.library.BluetoothState;
 import app.akexorcist.bluetotohspp.library.DeviceList;
 
-public class TerminalActivity extends AppCompatActivity {
+public class TerminalActivity extends AppCompatActivity { // bluetooth terminal 엑티비티
     BluetoothSPP bt;
 
     TextView textStatus, textRead;
